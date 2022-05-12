@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "HSM6KmLsG7ziTrA0kK17mT3OoBClRmdaFKPXFG19t1jfsU660st+g63IjEhFJHw9fxiSWKAOpA+6RHxdq0lPDA==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\dedoa\\.nuget\\packages\\microsoft.aspnetcore.http.features\\5.0.16\\microsoft.aspnetcore.http.features.5.0.16.nupkg.sha512",
+    "C:\\Users\\dedoa\\.nuget\\packages\\microsoft.extensions.primitives\\5.0.1\\microsoft.extensions.primitives.5.0.1.nupkg.sha512",
+    "C:\\Users\\dedoa\\.nuget\\packages\\system.io.pipelines\\5.0.2\\system.io.pipelines.5.0.2.nupkg.sha512"
+  ],
+  "logs": []
+}
