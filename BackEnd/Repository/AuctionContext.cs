@@ -1,5 +1,7 @@
-﻿using Domain;
+﻿using System.Collections.Generic;
+using Domain;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace Repository
 {
@@ -29,6 +31,12 @@ namespace Repository
                 .HasOne(a => a.Seller)
                 .WithMany(u => u.Auctions)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Auction>()
+                .Property(a => a.OtherDetails)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<IDictionary<string, string>>(v));
             
             modelBuilder.Entity<User>()
                 .HasData(new User

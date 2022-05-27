@@ -136,3 +136,5 @@ C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\BackEnd_API\obj\Debug\net5.0\refint\
 C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\BackEnd_API\obj\Debug\net5.0\BackEnd_API.pdb
 C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\BackEnd_API\obj\Debug\net5.0\BackEnd_API.genruntimeconfig.cache
 C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\BackEnd_API\obj\Debug\net5.0\ref\BackEnd_API.dll
+C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\BackEnd_API\bin\Debug\net5.0\Infrastructure.dll
+C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\BackEnd_API\bin\Debug\net5.0\Infrastructure.pdb

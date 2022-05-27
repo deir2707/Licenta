@@ -1,0 +1,30 @@
+.loginPage {
+    background-image: url("../../public/images/background.jpg");
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: 100vw;
+    height: 100vh;
+}
+
+.form-div {
+    position: absolute;
+    width: 300px;
+    left: 50%;
+    top: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    background-color: whitesmoke;
+    border-radius: 1rem;
+    padding: 10px;
+}
+
+.formError {
+    color: red;
+    white-space: pre-line;
+    margin-bottom: 10px;
+}
+
+.MuiTextField-root {
+    margin: 4px 0 !important;
+}

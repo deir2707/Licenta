@@ -7,8 +7,9 @@ namespace Service
     public interface IUserService
     {
         
-        public Task<int> AddUser(AddUserInput addUserInput);
+        public Task<int> Register(RegisterInput registerInput);
         public Task<UserDTO> GetUserDTO(int id);
 
+        public Task<UserDTO> Login(LoginInput loginInput);
     }
 }

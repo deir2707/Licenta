@@ -62,7 +62,7 @@ namespace Repository.Migrations
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Name")
+                    b.Property<string>("OtherDetails")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("SellerId")
@@ -72,6 +72,9 @@ namespace Repository.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<int>("StartingPrice")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -121,6 +124,8 @@ namespace Repository.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuctionId");
 
                     b.ToTable("Images");
                 });
@@ -204,6 +209,17 @@ namespace Repository.Migrations
                     b.Navigation("Auction");
 
                     b.Navigation("Bidder");
+                });
+
+            modelBuilder.Entity("Domain.Image", b =>
+                {
+                    b.HasOne("Domain.Auction", "auction")
+                        .WithMany()
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("auction");
                 });
 
             modelBuilder.Entity("Domain.User", b =>

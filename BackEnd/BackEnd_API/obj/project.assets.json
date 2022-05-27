@@ -1617,6 +1617,16 @@
           "bin/placeholder/Domain.dll": {}
         }
       },
+      "Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Infrastructure.dll": {}
+        }
+      },
       "Repository/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
@@ -1636,6 +1646,7 @@
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
         "dependencies": {
+          "Infrastructure": "1.0.0",
           "Repository": "1.0.0"
         },
         "compile": {
@@ -6046,6 +6057,11 @@
       "path": "../Domain/Domain.csproj",
       "msbuildProject": "../Domain/Domain.csproj"
     },
+    "Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../Infrastructure/Infrastructure.csproj",
+      "msbuildProject": "../Infrastructure/Infrastructure.csproj"
+    },
     "Repository/1.0.0": {
       "type": "project",
       "path": "../Repository/Repository.csproj",
@@ -6060,6 +6076,7 @@
   "projectFileDependencyGroups": {
     "net5.0": [
       "Domain >= 1.0.0",
+      "Infrastructure >= 1.0.0",
       "Microsoft.EntityFrameworkCore.Design >= 5.0.15",
       "Repository >= 1.0.0",
       "Service >= 1.0.0",
@@ -6095,6 +6112,9 @@
           "projectReferences": {
             "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj": {
               "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj"
+            },
+            "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj"
             },
             "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj": {
               "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj"

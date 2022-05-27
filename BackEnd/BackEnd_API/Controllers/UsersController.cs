@@ -17,14 +17,21 @@ namespace BackEnd.Controllers
             _userService = userService;
         }
 
-        [HttpPost("add-user")]
-        public async Task<int> AddUser(AddUserInput addUserInput)
+        [HttpPost("login")]
+        public async Task<UserDTO> LoginUser(LoginInput loginInput)
         {
-            var addedId = await _userService.AddUser(addUserInput);
+            var userDto = await _userService.Login(loginInput);
+            return userDto;
+        }
+
+        [HttpPost("register")]
+        public async Task<int> Register(RegisterInput registerInput)
+        {
+            var addedId = await _userService.Register(registerInput);
             return addedId;
         }
 
-        [HttpGet]
+        [HttpGet("{id:int}")]
         public async Task<UserDTO> GetUser(int id)
         {
             return await _userService.GetUserDTO(id);

@@ -4,6 +4,8 @@
     public class Image : IEntity
     {
         public int Id { get; set; }
+        
+        public Auction auction { get; set; }
 
         public int AuctionId { get; set; }
 

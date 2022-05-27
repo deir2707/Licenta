@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Domain;
 using Microsoft.EntityFrameworkCore;
@@ -8,59 +7,62 @@ namespace Repository
 {
     public class Repository<T> : IRepository<T> where T :class, IEntity
     {
-        private readonly AuctionContext DbContext;
+        private readonly AuctionContext _dbContext;
 
-        public Repository(AuctionContext dbContext)
+        public AuctionContext DbContext => _dbContext;
+        
+        public Repository(AuctionContext dbContext) : base(dbContext)
         {
-            DbContext = dbContext;
+            _dbContext = dbContext;
         }
+        
 
-        public async Task<T> GetById(int id)
+        public override async Task<T> GetById(int id)
         {
-            var dbSet = DbContext.Set<T>();
+            var dbSet = _dbContext.Set<T>();
             return await dbSet.FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task<IEnumerable<T>> GetAll()
+        public override async Task<IEnumerable<T>> GetAll()
         {
-            var dbSet = DbContext.Set<T>();
+            var dbSet = _dbContext.Set<T>();
             return await dbSet.ToListAsync();
         }
 
-        public async Task<bool> CheckIfExist(int id)
+        public override async Task<bool> CheckIfExist(int id)
         {
-            var dbSet = DbContext.Set<T>();
+            var dbSet = _dbContext.Set<T>();
             return await dbSet.AnyAsync(u => u.Id == id);
         }
 
-        public async Task<T> AddAsync(T newEntity)
+        public override async Task<T> AddAsync(T newEntity)
         {
-            var dbSet = DbContext.Set<T>();
+            var dbSet = _dbContext.Set<T>();
             var x=await dbSet.AddAsync(newEntity);
             return x.Entity;
         }
 
-        public void RemoveEntity(T entity)
+        public override void RemoveEntity(T entity)
         {
-            var dbSet = DbContext.Set<T>();
+            var dbSet = _dbContext.Set<T>();
             dbSet.Remove(entity);
         }
 
-        public void Update(T entity)
+        public override void Update(T entity)
         {
-            var dbSet = DbContext.Set<T>();
+            var dbSet = _dbContext.Set<T>();
             dbSet.Update(entity);
         }
 
-        public async Task AddRange(IEnumerable<T> newEntities)
+        public override async Task AddRange(IEnumerable<T> newEntities)
         {
-            var dbSet = DbContext.Set<T>();
+            var dbSet = _dbContext.Set<T>();
             await dbSet.AddRangeAsync(newEntities);
         }
 
-        public async Task SaveChanges()
+        public override async Task SaveChanges()
         {
-            await DbContext.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

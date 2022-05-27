@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Domain;
+using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Repository;
 using Service.Inputs;
@@ -18,12 +18,17 @@ namespace Service
             _userRepository = userRepository;
         }
 
-        public async Task<int> AddUser(AddUserInput addUserInput)
+        public async Task<int> Register(RegisterInput registerInput)
         {
-            var user = new User
+            var user = await FetchUserByEmail(registerInput.Email);
+
+            if (user is not null)
+                throw new AuctionException(ErrorCode.User_Already_Exists, "User already exists");
+                    
+            user = new User
             {
-                Email = addUserInput.Email,
-                Password = addUserInput.Password
+                Email = registerInput.Email,
+                Password = registerInput.Password
             };
             
             var x=await _userRepository.AddAsync(user);
@@ -34,18 +39,72 @@ namespace Service
 
         public async Task<UserDTO> GetUserDTO(int id)
         {
+            // var auction = new Auction
+            // {
+            //     Name = "test",
+            //     Description = "testdesc",
+            //     StartDate = DateTime.Now,
+            //     EndDate = DateTime.Now,
+            //     StartingPrice = 100,
+            //     SellerId = 1,
+            //     Type = AuctionType.Car,
+            //     OtherDetails = new Dictionary<string, string>
+            //     {
+            //         ["Year"] = "2019",
+            //         ["Transmission"] = "Manual",
+            //         ["Make"] = "Audi",
+            //         ["Model"] = "A4"
+            //     }
+            // };
+            //
+            // foreach (var auctionOtherDetail in auction.OtherDetails)
+            // {
+            //     auctionOtherDetail.
+            // }
+
+            // await _auctionRepository.AddAsync(auction);
+            // await _auctionRepository.SaveChanges();
+            
+            var user = await GetUser(id);
+
+
+            return user.ToUserDto();
+        }
+
+        private async Task<User> GetUser(int id)
+        {
             var user = await _userRepository.GetById(id);
             if (user is null)
             {
-                throw new Exception("Invalid id");
+                throw new AuctionException(ErrorCode.User_Not_Found, "Invalid id");
             }
 
-            var userDTO = new UserDTO
+            return user;
+        }
+        private async Task<User> GetUserByEmail(string email)
+        {
+            var user = await FetchUserByEmail(email);
+            
+            if (user is null)
             {
-                Id = user.Id,
-                Email = user.Email,
-            };
-            return userDTO;
+                throw new AuctionException(ErrorCode.User_Not_Found, "Invalid credentials");
+            }
+
+            return user;
+        }
+
+        private async Task<User> FetchUserByEmail(string email)
+        {
+            return await _userRepository.DbContext.Users
+                .FirstOrDefaultAsync(u => u.Email.Equals(email));
+        }
+
+        public async Task<UserDTO> Login(LoginInput loginInput)
+        {
+            var user = await GetUserByEmail(loginInput.Email);
+            if (!user.Password.Equals(loginInput.Password))
+                throw new AuctionException(ErrorCode.User_Not_Found, "Invalid credentials");
+            return user.ToUserDto();
         }
     }
 }

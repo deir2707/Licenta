@@ -8,6 +8,7 @@
     ".NETCoreApp,Version=v5.0": {
       "Service/1.0.0": {
         "dependencies": {
+          "Infrastructure": "1.0.0",
           "Repository": "1.0.0"
         },
         "runtime": {
@@ -1067,6 +1068,11 @@
           "Domain.dll": {}
         }
       },
+      "Infrastructure/1.0.0": {
+        "runtime": {
+          "Infrastructure.dll": {}
+        }
+      },
       "Repository/1.0.0": {
         "dependencies": {
           "Domain": "1.0.0",
@@ -1758,6 +1764,11 @@
       "hashPath": "system.xml.xmlserializer.4.3.0.nupkg.sha512"
     },
     "Domain/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Infrastructure/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""

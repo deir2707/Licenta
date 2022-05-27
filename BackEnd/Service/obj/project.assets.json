@@ -1517,6 +1517,16 @@
           "bin/placeholder/Domain.dll": {}
         }
       },
+      "Infrastructure/1.0.0": {
+        "type": "project",
+        "framework": ".NETCoreApp,Version=v5.0",
+        "compile": {
+          "bin/placeholder/Infrastructure.dll": {}
+        },
+        "runtime": {
+          "bin/placeholder/Infrastructure.dll": {}
+        }
+      },
       "Repository/1.0.0": {
         "type": "project",
         "framework": ".NETCoreApp,Version=v5.0",
@@ -5794,6 +5804,11 @@
       "path": "../Domain/Domain.csproj",
       "msbuildProject": "../Domain/Domain.csproj"
     },
+    "Infrastructure/1.0.0": {
+      "type": "project",
+      "path": "../Infrastructure/Infrastructure.csproj",
+      "msbuildProject": "../Infrastructure/Infrastructure.csproj"
+    },
     "Repository/1.0.0": {
       "type": "project",
       "path": "../Repository/Repository.csproj",
@@ -5802,6 +5817,7 @@
   },
   "projectFileDependencyGroups": {
     "net5.0": [
+      "Infrastructure >= 1.0.0",
       "Repository >= 1.0.0"
     ]
   },
@@ -5832,6 +5848,9 @@
         "net5.0": {
           "targetAlias": "net5.0",
           "projectReferences": {
+            "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj": {
+              "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj"
+            },
             "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj": {
               "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj"
             }

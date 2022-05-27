@@ -32,3 +32,5 @@ C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\Service\obj\Debug\net5.0\Service.dll
 C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\Service\obj\Debug\net5.0\refint\Service.dll
 C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\Service\obj\Debug\net5.0\Service.pdb
 C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\Service\obj\Debug\net5.0\ref\Service.dll
+C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\Service\bin\Debug\net5.0\Infrastructure.dll
+C:\Users\dedoa\IdeaProjects\Licenta\BackEnd\Service\bin\Debug\net5.0\Infrastructure.pdb
