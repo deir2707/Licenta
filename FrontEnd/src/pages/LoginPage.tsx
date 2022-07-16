@@ -23,7 +23,7 @@ export const LoginPage = () => {
 
         Api.post<LoginInput, UserDto>(`${ApiEndpoints.users}/login`, loginModel)
           .then(({ data: { id, fullname, email, balance } }) => {
-            debugger;
+            
             localStorage.setItem("userId", id.toString());
             localStorage.setItem("fullName", fullname);
             localStorage.setItem("email", email);

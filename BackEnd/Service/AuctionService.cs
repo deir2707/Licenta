@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain;
 using Microsoft.AspNetCore.Http;
@@ -11,7 +12,7 @@ namespace Service
 {
     public class AuctionService: IAuctionService
     {
-        private AuctionContext _auctionContext;
+        private readonly AuctionContext _auctionContext;
 
         public AuctionService(AuctionContext auctionContext)
         {
@@ -20,7 +21,7 @@ namespace Service
 
         public async Task<int> CreateCarAuction(CarInput carInput)
         {
-            var otherDetails = new Dictionary<string,string>()
+            var otherDetails = new Dictionary<string,string>
             {
                 {"make", carInput.Make},
                 {"model", carInput.Model},
@@ -30,6 +31,25 @@ namespace Service
                 {"fuelType", carInput.FuelType},
                 {"mileage", carInput.Mileage.ToString()}
             };
+
+            var images = carInput.Images.Select(img =>
+            {
+                var fileName = Path.GetFileName(img.FileName);
+                var fileExtension = Path.GetExtension(img.FileName);
+                var filePath = string.Concat(fileName, fileExtension);
+
+                var photoEntity = new Image
+                {
+                    ImageFileName = filePath,
+                    FileType = fileExtension,
+                };
+
+                using var target = new MemoryStream();
+                img.CopyTo(target);
+                photoEntity.DataFiles = target.ToArray();
+
+                return photoEntity;
+            }).ToList();
             
             var auction = new Auction
             {
@@ -38,43 +58,10 @@ namespace Service
                 StartDate = DateTime.UtcNow,
                 EndDate = DateTime.UtcNow.AddDays(7),
                 Type = AuctionType.Car,
-                // Images = new List<ImageFile>
-                // {
-                //     new(carInput.CarImagesInput.OpenReadStream(), carInput.CarImagesInput)
-                // },
                 OtherDetails = otherDetails,
-                SellerId = carInput.UserId
+                SellerId = carInput.UserId,
+                Images = images
             };
-
-            var images = new List<IFormFile>
-            {
-                carInput.CarImagesInput
-            };
-
-            var auctionImages = new List<Image>();
-
-            foreach (var image in images)
-            {
-                var fileName = Path.GetFileName(image.FileName);
-                var fileExtension = Path.GetExtension(image.FileName);
-                var filePath = String.Concat(fileName, fileExtension);
-            
-                var photoEntity = new Image
-                {
-                    AuctionId = auction.Id,
-                    ImageFileName = filePath,
-                    FileType = fileExtension,
-                };
-
-                using (var target = new MemoryStream())
-                {
-                    image.CopyTo(target);
-                    photoEntity.DataFiles = target.ToArray();
-                }
-                auctionImages.Add(photoEntity);
-            }
-
-            auction.Images = auctionImages;
 
             await _auctionContext.Auctions.AddAsync(auction);
             await _auctionContext.SaveChangesAsync();

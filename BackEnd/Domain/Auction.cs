@@ -6,9 +6,9 @@ namespace Domain
 {
     public enum AuctionType
     {
-        Car,
-        Painting,
-        Vase
+        Car = 1,
+        Painting = 2,
+        Vase = 3
     }
 
     public  class Auction : IEntity

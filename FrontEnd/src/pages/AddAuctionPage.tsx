@@ -9,14 +9,13 @@ import { CarInput } from "../interfaces/ItemsInterfaces";
 import { useNavigate } from "react-router-dom";
 import { useApiError } from "../hooks/useApiError";
 import { UserContext } from "../context/UserContext";
-import { getImageFormData } from "../helpers/FormHelpers";
 
 interface ItemType {
   [key: string]: string[];
 }
 
 export const AddAuctionPage = () => {
-  const [file, setFile] = useState<File | undefined>();
+  const [file, setFile] = useState<File[] | undefined>();
 
   const { userId, fullName } = useContext(UserContext);
   console.log(userId, fullName);
@@ -48,9 +47,14 @@ export const AddAuctionPage = () => {
   };
 
   const onFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    debugger;
-    const file = e.target.files?.[0];
-    setFile(file);
+    const files: File[] = [];
+
+    for (let i = 0; i < e.target.files!.length; i++) {
+      const file = e.target.files?.[i];
+      if (file) files.push(file);
+    }
+
+    setFile(files);
   };
 
   const onSubmit = async (
@@ -70,7 +74,11 @@ export const AddAuctionPage = () => {
     formdata.append("Description", values.Description);
     formdata.append("UserId", userId.toString());
 
-    if (file) formdata.append("CarImagesInput", file);
+    if (file) {
+      for (let i = 0; i < file.length; i++) {
+        formdata.append(`images`, file[i]);
+      }
+    }
 
     Api.post(`${ApiEndpoints.add_car}`, formdata, {
       headers: {
@@ -94,7 +102,6 @@ export const AddAuctionPage = () => {
     EngineCapacity: "",
     Mileage: "",
     FuelType: "",
-    // FileWrapper: undefined,
     Description: "",
     UserId: "",
   };
@@ -168,7 +175,7 @@ export const AddAuctionPage = () => {
           />
           <Button variant="contained" component="label">
             Upload File
-            <input type="file" hidden onChange={onFileUpload} />
+            <input type="file" hidden onChange={onFileUpload} multiple />
           </Button>
           <Button variant="contained" color="primary" type="submit">
             Add auction

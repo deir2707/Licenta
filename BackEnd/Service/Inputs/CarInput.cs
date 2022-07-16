@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace Service.Inputs
 {
-    public class IFormFileWrapper
-    {
-        public IFormFile File { get; set; }
-    }
-
     public class CarInput
     {
         // [Required]
@@ -19,14 +15,8 @@ namespace Service.Inputs
         public int EngineCapacity { get; set; }
         public int Mileage { get; set; }
         public string FuelType { get; set; }
-        // public IFormFileWrapper FileWrapper { get; set; }
         public string Description { get; set; }
         public int UserId { get; set; }
-        public IFormFile CarImagesInput { get; set; }
-    }
-
-    public class CarImagesInput
-    {
-        public IFormFile File { get; set; }
+        public List<IFormFile> Images { get; set; }
     }
 }

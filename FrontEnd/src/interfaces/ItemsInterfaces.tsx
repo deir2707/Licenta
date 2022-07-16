@@ -13,5 +13,5 @@ export interface CarInput {
   CarImageInput?: CarImageInput;
 }
 export interface CarImageInput {
-  file: File;
+  files: any[];
 }
