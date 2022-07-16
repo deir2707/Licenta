@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace Domain
 {
@@ -23,5 +24,7 @@ namespace Domain
         public int? BuyerId { get; set; }
         public User? Buyer { get; set; }
         public IDictionary<string,string> OtherDetails { get; set; }
+        
+        public List<Image> Images { get; set; }
     }
 }

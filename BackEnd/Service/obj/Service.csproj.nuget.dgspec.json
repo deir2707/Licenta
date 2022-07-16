@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Service\\Service.csproj": {}
+    "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Service\\Service.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj": {
+    "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Domain\\Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj",
+        "projectUniqueName": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Domain\\Domain.csproj",
         "projectName": "Domain",
-        "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj",
-        "packagesPath": "C:\\Users\\dedoa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\obj\\",
+        "projectPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Domain\\Domain.csproj",
+        "packagesPath": "C:\\Users\\Adrian\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Domain\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\dedoa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Adrian\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -22,6 +22,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\Adrian\\Documents\\UiPath\\CustomActivities": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -60,21 +61,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj": {
+    "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj",
         "projectName": "Infrastructure",
-        "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj",
-        "packagesPath": "C:\\Users\\dedoa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\obj\\",
+        "projectPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj",
+        "packagesPath": "C:\\Users\\Adrian\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\dedoa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Adrian\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -82,6 +83,7 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\Adrian\\Documents\\UiPath\\CustomActivities": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
@@ -114,21 +116,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj": {
+    "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Repository\\Repository.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj",
+        "projectUniqueName": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Repository\\Repository.csproj",
         "projectName": "Repository",
-        "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj",
-        "packagesPath": "C:\\Users\\dedoa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\obj\\",
+        "projectPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Repository\\Repository.csproj",
+        "packagesPath": "C:\\Users\\Adrian\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Repository\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\dedoa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Adrian\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -136,14 +138,15 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\Adrian\\Documents\\UiPath\\CustomActivities": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj": {
-                "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Domain\\Domain.csproj"
+              "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Domain\\Domain.csproj": {
+                "projectPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Domain\\Domain.csproj"
               }
             }
           }
@@ -188,21 +191,21 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Service\\Service.csproj": {
+    "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Service\\Service.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Service\\Service.csproj",
+        "projectUniqueName": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Service\\Service.csproj",
         "projectName": "Service",
-        "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Service\\Service.csproj",
-        "packagesPath": "C:\\Users\\dedoa\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Service\\obj\\",
+        "projectPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Service\\Service.csproj",
+        "packagesPath": "C:\\Users\\Adrian\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Service\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "C:\\Users\\dedoa\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\Adrian\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -210,17 +213,18 @@
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
+          "C:\\Users\\Adrian\\Documents\\UiPath\\CustomActivities": {},
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "net5.0": {
             "targetAlias": "net5.0",
             "projectReferences": {
-              "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj"
+              "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Infrastructure\\Infrastructure.csproj"
               },
-              "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj": {
-                "projectPath": "C:\\Users\\dedoa\\IdeaProjects\\Licenta\\BackEnd\\Repository\\Repository.csproj"
+              "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Repository\\Repository.csproj": {
+                "projectPath": "C:\\Users\\Adrian\\Documents\\Facultate\\edo\\Licenta\\BackEnd\\Repository\\Repository.csproj"
               }
             }
           }
@@ -249,7 +253,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.100\\RuntimeIdentifierGraph.json"
         }
       }
     }

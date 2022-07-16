@@ -1,18 +1,14 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 using Service.Inputs;
-using Service.Outputs;
 
 namespace BackEnd.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuctionsController
+    public class AuctionsController: ControllerBase
     {
-        
-        
             private readonly IAuctionService _auctionService;
 
             public AuctionsController(IAuctionService auctionService)
@@ -21,10 +17,10 @@ namespace BackEnd.Controllers
             }
 
             [HttpPost("add-car")]
-            public async Task<Boolean> CreateCarAction( CarInput carInput)
+            public async Task<IActionResult> CreateCarAction([FromForm] CarInput carInput)
             {
-                var response =  _auctionService.CreateCarAction(carInput);
-                return response;
+                var response = await  _auctionService.CreateCarAuction(carInput);
+                return Ok(response);
             }
     }
 }

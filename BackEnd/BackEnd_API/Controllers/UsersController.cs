@@ -8,7 +8,7 @@ namespace BackEnd.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UsersController
+    public class UsersController: ControllerBase
     {
         private readonly IUserService _userService;
 
@@ -18,23 +18,24 @@ namespace BackEnd.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<UserDTO> LoginUser(LoginInput loginInput)
+        public async Task<IActionResult> LoginUser(LoginInput loginInput)
         {
             var userDto = await _userService.Login(loginInput);
-            return userDto;
+            return Ok(userDto);
         }
 
         [HttpPost("register")]
-        public async Task<int> Register(RegisterInput registerInput)
+        public async Task<IActionResult> Register(RegisterInput registerInput)
         {
             var addedId = await _userService.Register(registerInput);
-            return addedId;
+            return Ok(addedId);
         }
 
         [HttpGet("{id:int}")]
-        public async Task<UserDTO> GetUser(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
-            return await _userService.GetUserDTO(id);
+            var userDto = await _userService.GetUserDTO(id);
+            return Ok(userDto);
         }
 
     }

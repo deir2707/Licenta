@@ -5,32 +5,36 @@ export interface ProviderProps {
 }
 
 interface UserContextModel {
-  userId: string;
+  userId: number;
   fullName: string;
   email: string;
-  balance: string
-  setUserId: (value: string) => void;
+  balance: string;
+  setUserId: (value: number) => void;
   setFullName: (value: string) => void;
   setEmail: (value: string) => void;
   setBalance: (value: string) => void;
 }
 
 export const UserContext = createContext<UserContextModel>({
-  userId: "",
+  userId: 0,
   fullName: "",
   email: "",
   balance: "",
-  setUserId: null as unknown as (value: string) => void,
+  setUserId: null as unknown as (value: number) => void,
   setFullName: null as unknown as (value: string) => void,
   setEmail: null as unknown as (value: string) => void,
   setBalance: null as unknown as (value: string) => void,
 });
 
 export const UserContextProvider = ({ children }: ProviderProps) => {
-  const [userId, setUserId] = useState(localStorage.getItem("user") as string);
-  const [fullName, setFullName] = useState(localStorage.getItem("fullName") as string);
+  const [userId, setUserId] = useState(localStorage.getItem("user") as unknown as number);
+  const [fullName, setFullName] = useState(
+    localStorage.getItem("fullName") as string
+  );
   const [email, setEmail] = useState(localStorage.getItem("email") as string);
-  const [balance, setBalance] = useState(localStorage.getItem("balance") as string);
+  const [balance, setBalance] = useState(
+    localStorage.getItem("balance") as string
+  );
 
   const data = {
     userId,
@@ -40,7 +44,7 @@ export const UserContextProvider = ({ children }: ProviderProps) => {
     email,
     setEmail,
     balance,
-    setBalance
+    setBalance,
   };
 
   return <UserContext.Provider value={data}>{children}</UserContext.Provider>;

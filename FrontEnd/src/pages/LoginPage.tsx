@@ -22,20 +22,21 @@ export const LoginPage = () => {
         }
 
         Api.post<LoginInput, UserDto>(`${ApiEndpoints.users}/login`, loginModel)
-            .then(({ data:{id,fullname,email,balance}}) => {
-                localStorage.setItem("userId", ""+id);
-                localStorage.setItem("fullName", fullname);
-                localStorage.setItem("email", email);
-                localStorage.setItem("balance",""+balance);
-                setUserId(""+id)
-                setFullName(fullname)
-                setEmail(email)
-                setBalance(""+balance)
-                navigate("/mainpage")
-            })
-            .catch((error) => {
-                handleApiError(error, formikHelpers.setStatus)
-            })
+          .then(({ data: { id, fullname, email, balance } }) => {
+            debugger;
+            localStorage.setItem("userId", id.toString());
+            localStorage.setItem("fullName", fullname);
+            localStorage.setItem("email", email);
+            localStorage.setItem("balance", "" + balance);
+            setUserId(id);
+            setFullName(fullname);
+            setEmail(email);
+            setBalance("" + balance);
+            navigate("/mainpage");
+          })
+          .catch((error) => {
+            handleApiError(error, formikHelpers.setStatus);
+          });
     }
 
     const onRegisterClick = () => {
