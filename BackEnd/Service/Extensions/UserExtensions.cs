@@ -1,7 +1,7 @@
 ﻿using Domain;
 using Service.Outputs;
 
-namespace Service
+namespace Service.Extensions
 {
     public static class UserExtensions
     {

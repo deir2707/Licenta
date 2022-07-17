@@ -1,0 +1,19 @@
+.navbarItem,
+.logoutButton {
+  width: 100%;
+  line-height: 100px;
+  display: block;
+  color: white;
+  text-decoration: none;
+  background-color: #262626;
+  text-align: center;
+
+  &:hover {
+    background-color: #5b5b5b;
+    color: white;
+  }
+
+  &.selected {
+    background-color: #5b5b5b;
+  }
+}

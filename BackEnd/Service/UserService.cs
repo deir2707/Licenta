@@ -4,6 +4,7 @@ using Domain;
 using Infrastructure.Models;
 using Microsoft.EntityFrameworkCore;
 using Repository;
+using Service.Extensions;
 using Service.Inputs;
 using Service.Outputs;
 
@@ -39,34 +40,7 @@ namespace Service
 
         public async Task<UserDTO> GetUserDTO(int id)
         {
-            // var auction = new Auction
-            // {
-            //     Name = "test",
-            //     Description = "testdesc",
-            //     StartDate = DateTime.Now,
-            //     EndDate = DateTime.Now,
-            //     StartingPrice = 100,
-            //     SellerId = 1,
-            //     Type = AuctionType.Car,
-            //     OtherDetails = new Dictionary<string, string>
-            //     {
-            //         ["Year"] = "2019",
-            //         ["Transmission"] = "Manual",
-            //         ["Make"] = "Audi",
-            //         ["Model"] = "A4"
-            //     }
-            // };
-            //
-            // foreach (var auctionOtherDetail in auction.OtherDetails)
-            // {
-            //     auctionOtherDetail.
-            // }
-
-            // await _auctionRepository.AddAsync(auction);
-            // await _auctionRepository.SaveChanges();
-            
             var user = await GetUser(id);
-
 
             return user.ToUserDto();
         }

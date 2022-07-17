@@ -1,7 +1,7 @@
 import React from "react"
 import { Route, Routes } from "react-router-dom"
-import { AddAuctionPage } from "./pages/AddAuctionPage"
-import { AuctionsPage } from "./pages/AuctionsPage"
+import { AddAuctionPage } from "./pages/auctions/AddAuction/AddAuctionPage";
+import { AuctionsPage } from "./pages/auctions/ViewAuctions/AuctionsPage";
 import { LoginPage } from "./pages/LoginPage"
 import { MainPage } from "./pages/MainPage"
 import { RegisterPage } from "./pages/RegisterPage"

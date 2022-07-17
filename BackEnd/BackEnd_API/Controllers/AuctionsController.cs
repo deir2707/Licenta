@@ -22,5 +22,12 @@ namespace BackEnd.Controllers
                 var response = await  _auctionService.CreateCarAuction(carInput);
                 return Ok(response);
             }
+            
+            [HttpGet]
+            public async Task<IActionResult> GetAllAuctions()
+            {
+                var response = await _auctionService.GetAllAuctions();
+                return Ok(response);
+            }
     }
 }

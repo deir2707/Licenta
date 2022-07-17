@@ -147,3 +147,4 @@ _UpgradeReport_Files/
 Thumbs.db
 Desktop.ini
 .DS_Store
+BackEnd/BackEnd_API/appsettings.json

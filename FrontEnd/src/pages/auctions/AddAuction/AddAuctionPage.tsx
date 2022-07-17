@@ -1,14 +1,13 @@
 import { Button, TextField } from "@mui/material";
-import React, { useContext, useState } from "react";
-import { PageLayout } from "../components/PageLayout";
-import "./AddAuctionPage.scss";
 import { FormikHelpers, useFormik } from "formik";
-import { ApiEndpoints } from "../ApiEndpoints";
-import Api from "../Api";
-import { CarInput } from "../interfaces/ItemsInterfaces";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useApiError } from "../hooks/useApiError";
-import { UserContext } from "../context/UserContext";
+import Api from "../../../Api";
+import { ApiEndpoints } from "../../../ApiEndpoints";
+import { PageLayout } from "../../../components/PageLayout";
+import { UserContext } from "../../../context/UserContext";
+import { useApiError } from "../../../hooks/useApiError";
+import { CarInput } from "../../../interfaces/ItemsInterfaces";
 
 interface ItemType {
   [key: string]: string[];
