@@ -9,5 +9,6 @@ namespace Service
     {
         public Task<int> CreateCarAuction(CarInput carInput);
         Task<List<AuctionDetails>> GetAllAuctions();
+        Task<int> MakeBid(BidInput bidInput);
     }
 }

@@ -1,9 +1,16 @@
-import React from 'react'
-import { PageLayout } from '../components/PageLayout'
+import { PageLayout } from "../components/PageLayout";
+
+export interface Notification {
+  id: number;
+  event: string;
+  message: string;
+  data: any;
+}
 
 export const MainPage = () => {
-    return (
-        <PageLayout>
-        </PageLayout>
-    )
-}
+  return (
+    <PageLayout>
+      <div></div>
+    </PageLayout>
+  );
+};

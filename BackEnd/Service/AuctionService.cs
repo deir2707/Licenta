@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
+using Infrastructure.Notifications;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Repository;
@@ -16,10 +17,12 @@ namespace Service
     public class AuctionService : IAuctionService
     {
         private readonly AuctionContext _auctionContext;
+        private readonly INotificationPublisher _notificationPublisher;
 
-        public AuctionService(AuctionContext auctionContext)
+        public AuctionService(AuctionContext auctionContext, INotificationPublisher notificationPublisher)
         {
             _auctionContext = auctionContext;
+            _notificationPublisher = notificationPublisher;
         }
 
         public async Task<int> CreateCarAuction(CarInput carInput)
@@ -52,6 +55,21 @@ namespace Service
                 .Include(a => a.Images)
                 .ToListAsync();
             return auctions.Select(a => a.ToAuctionDetails()).ToList();
+        }
+
+        public async Task<int> MakeBid(BidInput bidInput)
+        {
+            await _notificationPublisher.PublishMessageToUser(new Notification
+            {
+                Event = NotificationEvents.AuctionBid,
+                Data = new BidNotification
+                {
+                    AuctionId = bidInput.AuctionId,
+                    Amount = bidInput.Amount,
+                }
+            });
+
+            return 0;
         }
 
         private static Dictionary<string, string> ExtractOtherDetails(CarInput carInput)

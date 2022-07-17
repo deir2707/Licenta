@@ -1,5 +1,7 @@
+using BackEnd.Hubs;
 using BackEnd.Middleware;
 using Domain;
+using Infrastructure.Notifications;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +27,8 @@ namespace BackEnd
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
+            services.AddSignalR();
+            
             services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "BackEnd_API", Version = "v1"}); });
             
             services.AddDbContext<AuctionContext>(options =>
@@ -34,7 +38,10 @@ namespace BackEnd
             services.AddTransient<IAuctionService, AuctionService>();
             services.AddTransient<IRepository<User>,Repository<User>>();
             services.AddTransient<IRepository<Auction>,Repository<Auction>>();
-            // services.AddTransient<DbContext, AuctionContext>();
+
+            services.AddSingleton<INotificationPublisher, AuctionHub>();
+
+            services.AddHostedService<AuctionFinishService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -46,22 +53,25 @@ namespace BackEnd
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BackEnd_API v1"));
             }
-
-            app.UseCors(builder =>
-                builder.WithOrigins("http://localhost:3000")
-                    .AllowAnyHeader()
-                    .AllowAnyMethod()
-                    .AllowCredentials());
-            
             app.UseMiddleware<CustomExceptionMiddleware>();
             
             app.UseHttpsRedirection();
 
             app.UseRouting();
             
+            app.UseCors(builder =>
+                builder.WithOrigins("http://localhost:3000")
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials());
+
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers(); 
+                endpoints.MapHub<AuctionHub>("/hub/auctionHub");
+            });
         }
     }
 }
