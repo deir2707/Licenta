@@ -8,7 +8,7 @@ namespace Service
     public interface IAuctionService
     {
         public Task<int> CreateCarAuction(CarInput carInput);
-        Task<List<AuctionDetails>> GetAllAuctions();
+        Task<List<AuctionDetails>> GetAllAuctionDetails();
         Task<int> MakeBid(BidInput bidInput);
     }
 }

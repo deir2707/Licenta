@@ -13,4 +13,5 @@ export interface AuctionDetails {
   images: string[];
   startDate: Date;
   endDate: Date;
+  currentPrice: number;
 }

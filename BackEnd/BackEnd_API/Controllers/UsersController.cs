@@ -32,10 +32,10 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetUser(int id)
+        public Task<IActionResult> GetUser(int id)
         {
-            var userDto = await _userService.GetUserDTO(id);
-            return Ok(userDto);
+            var userDto = _userService.GetUserDTO(id);
+            return Task.FromResult<IActionResult>(Ok(userDto));
         }
 
     }

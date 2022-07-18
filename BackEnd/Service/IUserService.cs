@@ -8,7 +8,7 @@ namespace Service
     {
         
         public Task<int> Register(RegisterInput registerInput);
-        public Task<UserDTO> GetUserDTO(int id);
+        public UserDTO GetUserDTO(int id);
 
         public Task<UserDTO> Login(LoginInput loginInput);
     }

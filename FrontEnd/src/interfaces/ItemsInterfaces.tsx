@@ -6,11 +6,10 @@ export interface CarInput {
   EngineCapacity: string;
   Mileage: string;
   FuelType: string;
-  // FileWrapper?: FileWrapper;
-  UserId: string;
   Description: string;
   StartPrice: string;
   CarImageInput?: CarImageInput;
+  type: string;
 }
 export interface CarImageInput {
   files: any[];

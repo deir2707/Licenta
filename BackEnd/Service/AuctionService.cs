@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
+using Infrastructure;
+using Infrastructure.Models;
 using Infrastructure.Notifications;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -18,11 +20,13 @@ namespace Service
     {
         private readonly AuctionContext _auctionContext;
         private readonly INotificationPublisher _notificationPublisher;
+        private readonly ICurrentUserProvider _currentUserProvider;
 
-        public AuctionService(AuctionContext auctionContext, INotificationPublisher notificationPublisher)
+        public AuctionService(AuctionContext auctionContext, INotificationPublisher notificationPublisher, ICurrentUserProvider currentUserProvider)
         {
             _auctionContext = auctionContext;
             _notificationPublisher = notificationPublisher;
+            _currentUserProvider = currentUserProvider;
         }
 
         public async Task<int> CreateCarAuction(CarInput carInput)
@@ -39,7 +43,7 @@ namespace Service
                 EndDate = DateTime.UtcNow.AddDays(7),
                 Type = AuctionType.Car,
                 OtherDetails = otherDetails,
-                SellerId = carInput.UserId,
+                SellerId = _currentUserProvider.UserId,
                 Images = images
             };
 
@@ -49,27 +53,84 @@ namespace Service
             return auction.Id;
         }
 
-        public async Task<List<AuctionDetails>> GetAllAuctions()
+        public async Task<List<AuctionDetails>> GetAllAuctionDetails()
         {
-            var auctions = await _auctionContext.Auctions
-                .Include(a => a.Images)
-                .ToListAsync();
+            var auctions = await GetAllAuctions();
             return auctions.Select(a => a.ToAuctionDetails()).ToList();
         }
 
         public async Task<int> MakeBid(BidInput bidInput)
         {
+            var auction = await GetAuction(bidInput.AuctionId);
+
+            ValidateAuction(auction);
+            
+            var highestBid = auction.Bids.Where(b => b.AuctionId == bidInput.AuctionId)
+                .OrderByDescending(b => b.BidAmount).FirstOrDefault();
+
+            ValidateBid(bidInput, highestBid, auction);
+
+            var bid = new Bid
+            {
+                AuctionId = bidInput.AuctionId,
+                BidAmount = bidInput.BidAmount,
+                BidderId = _currentUserProvider.UserId,
+            };
+            
+            _currentUserProvider.User.Balance -= bidInput.BidAmount;
+
+            await _auctionContext.Bids.AddAsync(bid);
+            await _auctionContext.SaveChangesAsync();
+
             await _notificationPublisher.PublishMessageToUser(new Notification
             {
                 Event = NotificationEvents.AuctionBid,
                 Data = new BidNotification
                 {
                     AuctionId = bidInput.AuctionId,
-                    Amount = bidInput.Amount,
+                    BidAmount = bidInput.BidAmount,
                 }
             });
 
-            return 0;
+            return bid.Id;
+        }
+
+        private void ValidateAuction(Auction auction)
+        {
+            if (auction.EndDate < DateTime.UtcNow)
+            {
+                throw new AuctionException(ErrorCode.AuctionEnded, "Auction has ended");
+            }
+            
+            if (auction.SellerId == _currentUserProvider.UserId)
+            {
+                throw new AuctionException(ErrorCode.BidOnOwnAuction, "You cannot bid on your own auction");
+            }
+        }
+
+        private void ValidateBid(BidInput bidInput, Bid highestBid, Auction auction)
+        {
+            if (_currentUserProvider.User.Balance < bidInput.BidAmount)
+            {
+                throw new AuctionException(ErrorCode.InsufficientBalance, "Insufficient balance");
+            }
+            
+            if (highestBid == null)
+            {
+                if (bidInput.BidAmount <= auction.StartingPrice)
+                {
+                    throw new AuctionException(ErrorCode.BidTooSmall,
+                        "Bid amount must be greater than the starting bid");
+                }
+            }
+            else
+            {
+                if (bidInput.BidAmount <= highestBid.BidAmount)
+                {
+                    throw new AuctionException(ErrorCode.BidTooSmall,
+                        "Bid amount must be greater than the highest bid");
+                }
+            }
         }
 
         private static Dictionary<string, string> ExtractOtherDetails(CarInput carInput)
@@ -106,6 +167,28 @@ namespace Service
 
                 return photoEntity;
             }).ToList();
+        }
+
+        private async Task<Auction> GetAuction(int id)
+        {
+            var auction = await _auctionContext.Auctions
+                .Include(a => a.Bids)
+                .FirstOrDefaultAsync(a => a.Id == id);
+
+            if (auction == null)
+            {
+                throw new AuctionException(ErrorCode.AuctionNotFound, "Auction not found");
+            }
+
+            return auction;
+        }
+
+        private async Task<List<Auction>> GetAllAuctions()
+        {
+            return await _auctionContext.Auctions
+                .Include(a => a.Images)
+                .Include(a=>a.Bids)
+                .ToListAsync();
         }
     }
 }

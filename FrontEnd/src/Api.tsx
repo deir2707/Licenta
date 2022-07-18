@@ -3,18 +3,20 @@ import { PathLike } from "fs";
 import qs from "qs";
 
 const axiosConfig = {
-    returnRejectPromiseOnError: true,
-    timeout: 30000,
-    baseURL: "https://localhost:5001",
-    headers: {
-        common: {
-            "Cache-Control": "no-cache, no-store",
-            Pragma: "no-cache",
-            "Content-Type": "application/json",
-            Accept: "application/json",
-        },
+  returnRejectPromiseOnError: true,
+  timeout: 30000,
+  baseURL: "https://localhost:5001",
+  headers: {
+    common: {
+      "Cache-Control": "no-cache, no-store",
+      Pragma: "no-cache",
+      "Content-Type": "application/json",
+      Accept: "application/json",
     },
-    paramsSerializer: (params: PathLike) => qs.stringify(params, { indices: false }),
+    "User-Id": localStorage.getItem("userId") || "-1",
+  },
+  paramsSerializer: (params: PathLike) =>
+    qs.stringify(params, { indices: false }),
 };
 
 class ApiService {

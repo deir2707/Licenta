@@ -15,4 +15,3 @@ namespace BackEnd
                 .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); });
     }
 }
-/*dotnet dev-certs https*/

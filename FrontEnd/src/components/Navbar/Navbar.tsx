@@ -1,5 +1,6 @@
 import { Button, Stack } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { useCallback } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./Navbar.scss";
 
 const menuItems = [
@@ -29,6 +30,19 @@ const getPath = (pathname: string) => {
 export const Navbar = () => {
   const location = useLocation();
   const pathName = getPath(location.pathname);
+  const navigate = useNavigate();
+
+  const handleLogout = useCallback(() => {
+    localStorage.removeItem("balance");
+    localStorage.removeItem("email");
+    localStorage.removeItem("firstName");
+    localStorage.removeItem("fullName");
+    localStorage.removeItem("lastName");
+    localStorage.removeItem("userId");
+
+    navigate("/");
+  }, [navigate]);
+
   return (
     <Stack direction="row" width="100%" height="100%">
       {menuItems.map((item) => {
@@ -45,7 +59,9 @@ export const Navbar = () => {
           </Link>
         );
       })}
-      <Button className="logoutButton">Logout</Button>
+      <Button className="logoutButton" onClick={handleLogout}>
+        Logout
+      </Button>
     </Stack>
   );
 };

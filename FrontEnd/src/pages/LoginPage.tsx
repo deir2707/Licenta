@@ -23,15 +23,14 @@ export const LoginPage = () => {
 
         Api.post<LoginInput, UserDto>(`${ApiEndpoints.users}/login`, loginModel)
           .then(({ data: { id, fullname, email, balance } }) => {
-            
             localStorage.setItem("userId", id.toString());
             localStorage.setItem("fullName", fullname);
             localStorage.setItem("email", email);
-            localStorage.setItem("balance", "" + balance);
+            localStorage.setItem("balance", balance.toString());
             setUserId(id);
             setFullName(fullname);
             setEmail(email);
-            setBalance("" + balance);
+            setBalance(balance);
             navigate("/mainpage");
           })
           .catch((error) => {

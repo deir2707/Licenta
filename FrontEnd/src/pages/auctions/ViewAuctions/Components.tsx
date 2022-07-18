@@ -31,6 +31,7 @@ export const AuctionItem = (props: AuctionItemProps) => {
         <div className="body">
           <p>price: {price}</p>
           <p>description: {description}</p>
+          <p>current price: {price}</p>
         </div>
       </div>
     </div>

@@ -2,10 +2,13 @@
 {
     public enum ErrorCode
     {
-        User_Not_Found = 1,
-        User_Already_Exists = 2,
-        Transport_Not_Found = 3,
-        Truck_Not_Found = 4
+        UserNotFound = 100,
+        UserAlreadyExists = 101,
+        InsufficientBalance = 102,
+        AuctionNotFound = 200,
+        AuctionEnded = 201,
+        BidTooSmall = 300,
+        BidOnOwnAuction = 301,
     }
     
 }

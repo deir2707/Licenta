@@ -14,5 +14,7 @@ namespace Service.Outputs
         public List<byte[]> Images { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
+        
+        public int CurrentPrice { get; set; }
     }
 }

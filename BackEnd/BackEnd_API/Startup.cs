@@ -1,12 +1,15 @@
 using BackEnd.Hubs;
 using BackEnd.Middleware;
 using Domain;
+using Infrastructure;
 using Infrastructure.Notifications;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using Repository;
@@ -29,7 +32,11 @@ namespace BackEnd
             services.AddControllers();
             services.AddSignalR();
             
-            services.AddSwaggerGen(c => { c.SwaggerDoc("v1", new OpenApiInfo {Title = "BackEnd_API", Version = "v1"}); });
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo {Title = "BackEnd_API", Version = "v1"}); 
+                c.OperationFilter<CustomHeaderSwaggerAttribute>();
+            });
             
             services.AddDbContext<AuctionContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
@@ -40,6 +47,9 @@ namespace BackEnd
             services.AddTransient<IRepository<Auction>,Repository<Auction>>();
 
             services.AddSingleton<INotificationPublisher, AuctionHub>();
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+            
+            services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
 
             services.AddHostedService<AuctionFinishService>();
         }
@@ -53,7 +63,9 @@ namespace BackEnd
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BackEnd_API v1"));
             }
+            
             app.UseMiddleware<CustomExceptionMiddleware>();
+            app.UseMiddleware<UserValidationMiddleware>();
             
             app.UseHttpsRedirection();
 

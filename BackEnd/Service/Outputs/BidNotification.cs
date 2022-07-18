@@ -3,6 +3,6 @@
     public class BidNotification
     {
         public int AuctionId { get; set; }
-        public int Amount { get; set; }
+        public int BidAmount { get; set; }
     }
 }

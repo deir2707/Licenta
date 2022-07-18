@@ -20,9 +20,6 @@ namespace Repository
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Bid>()
-                .HasKey(bid => new {bid.BidderId, bid.AuctionId});
-        
-            modelBuilder.Entity<Bid>()
                 .HasOne(b=>b.Bidder)
                 .WithMany(u=>u.Bids)
                 .OnDelete(DeleteBehavior.NoAction);

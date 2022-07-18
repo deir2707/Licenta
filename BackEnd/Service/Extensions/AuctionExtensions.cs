@@ -8,18 +8,19 @@ namespace Service.Extensions
     {
         public static AuctionDetails ToAuctionDetails(this Auction auction)
         {
+            var highestBid = auction.Bids.OrderByDescending(b => b.BidAmount).FirstOrDefault();
+            
             return new AuctionDetails
             {
                 Id = auction.Id,
                 Description = auction.Description,
                 StartDate = auction.StartDate,
                 EndDate = auction.EndDate,
-                // CurrentPrice = auction.CurrentPrice,
-                // CurrentBidder = auction.CurrentBidder,
                 Images = auction.Images.Select(i => i.DataFiles).ToList(),
                 OtherDetails = auction.OtherDetails,
                 StartingPrice = auction.StartingPrice,
-                Type = auction.Type
+                Type = auction.Type,
+                CurrentPrice = highestBid?.BidAmount ?? auction.StartingPrice
             };
         }
     }

@@ -26,15 +26,15 @@ namespace BackEnd.Controllers
             [HttpGet]
             public async Task<IActionResult> GetAllAuctions()
             {
-                var response = await _auctionService.GetAllAuctions();
+                var response = await _auctionService.GetAllAuctionDetails();
                 return Ok(response);
             }
             
             [HttpPost("make-bid")]
             public async Task<IActionResult> MakeBid(BidInput bidInput)
             {
-                var response = await _auctionService.MakeBid(bidInput);
-                return Ok(response);
+                var id = await _auctionService.MakeBid(bidInput);
+                return Ok(id);
             }
     }
 }

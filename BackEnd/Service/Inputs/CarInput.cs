@@ -16,7 +16,6 @@ namespace Service.Inputs
         public int Mileage { get; set; }
         public string FuelType { get; set; }
         public string Description { get; set; }
-        public int UserId { get; set; }
         public List<IFormFile> Images { get; set; }
     }
 }

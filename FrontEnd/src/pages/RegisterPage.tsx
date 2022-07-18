@@ -29,10 +29,14 @@ export const RegisterPage = () => {
       registerModel
     )
       .then(({ data }) => {
+        localStorage.setItem("userId", data.id.toString());
+        localStorage.setItem("fullName", data.fullname);
+        localStorage.setItem("email", data.email);
+        localStorage.setItem("balance", data.balance.toString());
         setUserId(data.id);
         setFullName(data.fullname);
         setEmail(data.email);
-        setBalance("" + data.balance);
+        setBalance(data.balance);
         navigate("/mainpage");
       })
       .catch((error) => {
