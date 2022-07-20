@@ -42,7 +42,6 @@ export const AuctionsPage = () => {
 
   const handlePaginationChange = useCallback(
     (_event: ChangeEvent<unknown>, page: number) => {
-      console.log(page);
       setCurrentPage(page);
     },
     []

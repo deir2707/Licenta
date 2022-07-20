@@ -17,9 +17,9 @@ namespace BackEnd.Controllers
             }
 
             [HttpPost("add-car")]
-            public async Task<IActionResult> CreateCarAction([FromForm] CarInput carInput)
+            public async Task<IActionResult> CreateCarAction([FromForm] AuctionInput carInput)
             {
-                var response = await  _auctionService.CreateCarAuction(carInput);
+                var response = await  _auctionService.CreateAuction(carInput);
                 return Ok(response);
             }
             

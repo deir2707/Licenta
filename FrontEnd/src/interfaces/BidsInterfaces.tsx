@@ -1,6 +1,6 @@
 export interface BidDetails {
   id: number;
-  bidAmount: number;
-  bidDate: Date;
+  amount: number;
+  date: Date;
   bidderName: string;
 }

@@ -9,6 +9,7 @@ using Infrastructure.Models;
 using Infrastructure.Notifications;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Repository;
 using Service.Extensions;
 using Service.Inputs;
@@ -28,6 +29,50 @@ namespace Service
             _auctionContext = auctionContext;
             _notificationPublisher = notificationPublisher;
             _currentUserProvider = currentUserProvider;
+        }
+
+        public async Task<int> CreateAuction(AuctionInput auctionInput)
+        {
+            var images = ExtractImages(auctionInput.Images);
+
+            var otherDetails = ParseOtherDetails(auctionInput);
+
+            var auction = new Auction
+            {
+                Title = auctionInput.Title,
+                StartingPrice = auctionInput.StartPrice,
+                Description = auctionInput.Description,
+                StartDate = DateTime.UtcNow,
+                EndDate = DateTime.UtcNow.AddDays(7),
+                Type = AuctionType.Car,
+                OtherDetails = otherDetails,
+                SellerId = _currentUserProvider.UserId,
+                Images = images
+            };
+
+            await _auctionContext.Auctions.AddAsync(auction);
+            await _auctionContext.SaveChangesAsync();
+
+            return auction.Id;
+        }
+
+        private Dictionary<string,string> ParseOtherDetails(AuctionInput auctionInput)
+        {
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(auctionInput.OtherDetails);
+            // switch (auctionInput.Type)
+            // {
+            //     case AuctionType.Car:
+            //     {
+            //         return JsonConvert.DeserializeObject<CarInput2>(auctionInput.OtherDetails);
+            //         break;
+            //     }
+            //     case AuctionType.Painting:
+            //         break;
+            //     case AuctionType.Vase:
+            //         break;
+            //     default:
+            //         throw new ArgumentOutOfRangeException();
+            // }
         }
 
         public async Task<int> CreateCarAuction(CarInput carInput)
@@ -94,14 +139,14 @@ namespace Service
             ValidateAuction(auction);
 
             var highestBid = auction.Bids.Where(b => b.AuctionId == bidInput.AuctionId)
-                .OrderByDescending(b => b.BidAmount).FirstOrDefault();
+                .OrderByDescending(b => b.Amount).FirstOrDefault();
 
             ValidateBid(bidInput, highestBid, auction);
 
             var bid = new Bid
             {
                 AuctionId = bidInput.AuctionId,
-                BidAmount = bidInput.BidAmount,
+                Amount = bidInput.BidAmount,
                 BidderId = _currentUserProvider.UserId,
             };
 
@@ -153,7 +198,7 @@ namespace Service
             }
             else
             {
-                if (bidInput.BidAmount <= highestBid.BidAmount)
+                if (bidInput.BidAmount <= highestBid.Amount)
                 {
                     throw new AuctionException(ErrorCode.BidTooSmall,
                         "Bid amount must be greater than the highest bid");

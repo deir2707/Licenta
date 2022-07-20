@@ -8,7 +8,7 @@ namespace Service.Extensions
     {
         public static AuctionOutput ToAuctionOutput(this Auction auction)
         {
-            var highestBid = auction.Bids.OrderByDescending(b => b.BidAmount).FirstOrDefault();
+            var highestBid = auction.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
             
             return new AuctionOutput
             {
@@ -21,12 +21,12 @@ namespace Service.Extensions
                 StartingPrice = auction.StartingPrice,
                 Type = auction.Type,
                 NoOfBids = auction.Bids.Count,
-                CurrentPrice = highestBid?.BidAmount ?? auction.StartingPrice
+                CurrentPrice = highestBid?.Amount ?? auction.StartingPrice
             };
         }
         public static AuctionDetails ToAuctionDetails(this Auction auction)
         {
-            var highestBid = auction.Bids.OrderByDescending(b => b.BidAmount).FirstOrDefault();
+            var highestBid = auction.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
             
             return new AuctionDetails
             {
@@ -40,7 +40,7 @@ namespace Service.Extensions
                 StartingPrice = auction.StartingPrice,
                 Type = auction.Type,
                 NoOfBids = auction.Bids.Count,
-                CurrentPrice = highestBid?.BidAmount ?? auction.StartingPrice,
+                CurrentPrice = highestBid?.Amount ?? auction.StartingPrice,
                 Bids = auction.Bids.Select(b=>b.ToBidDetails()).ToList()
             };
         }

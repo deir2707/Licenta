@@ -1,9 +1,10 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { NoImage } from "../../../components/NoImage";
 import { Image } from "../../../components/Image";
 import Moment from "react-moment";
 import { Divider } from "@mui/material";
+import dateService from "../../../services/DateService";
 
 export interface AuctionItemProps {
   id: number;
@@ -19,7 +20,13 @@ export const AuctionItem = (props: AuctionItemProps) => {
   const { id, title, price, description, image, endDate, noOfBids } = props;
   const navigate = useNavigate();
 
-  const now = new Date();
+  const [timeLeft, setTimeLeft] = useState(dateService.getDuration(endDate));
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setTimeLeft(dateService.getDuration(endDate));
+    }, 1000);
+  });
 
   const handleOnClick = useCallback(() => {
     navigate(`/auctions/${id}`);
@@ -50,11 +57,7 @@ export const AuctionItem = (props: AuctionItemProps) => {
       <Divider orientation="vertical" flexItem />
       <div className="expiration">
         <strong>Ends in:</strong>
-        <Moment
-          duration={now}
-          date={endDate}
-          format="D [days,] H [hours and] m [minutes]"
-        />
+        {dateService.durationToString(timeLeft)}
       </div>
     </div>
   );

@@ -67,14 +67,14 @@ export const ViewAuctionDetails = () => {
       return <div>No bids yet</div>;
 
     return auction.bids
-      .sort((a, b) => b.bidAmount - a.bidAmount)
+      .sort((a, b) => b.amount - a.amount)
       .map((bid) => {
         return (
           <div key={bid.id} className="bid">
             <div className="bidder-name">
               <strong>{bid.bidderName ?? "unknown"}: </strong>
             </div>
-            <div className="bid-amount">{bid.bidAmount}</div>
+            <div className="bid-amount">{bid.amount}</div>
           </div>
         );
       });

@@ -41,12 +41,14 @@ namespace Repository
                     Id = 1,
                     Email = "user1@email.com",
                     Password = "password",
+                    FullName = "User1"
                 },
                     new User
                 {
                     Id = 2,
                     Email = "user2@email.com",
                     Password = "password2",
+                    FullName = "User2"
                 });
         }
     }

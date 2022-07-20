@@ -2,10 +2,12 @@ import { Button, TextField } from "@mui/material"
 import { FormikHelpers, useFormik } from "formik"
 import { useContext } from "react"
 import { useNavigate } from "react-router-dom"
-import Api from "../Api"
-import { ApiEndpoints } from "../ApiEndpoints"
-import { UserContext } from "../context/UserContext"
-import { useApiError } from "../hooks/useApiError"
+import * as yup from "yup";
+
+import Api from "../Api";
+import { ApiEndpoints } from "../ApiEndpoints";
+import { UserContext } from "../context/UserContext";
+import { useApiError } from "../hooks/useApiError";
 import { LoginInput, UserDetails } from "../interfaces/UsersInterfaces";
 import "./LoginPage.scss";
 
@@ -45,11 +47,23 @@ export const LoginPage = () => {
     navigate("/register");
   };
 
+  const validationSchema = yup.object({
+    email: yup
+      .string()
+      .email("Enter a valid email")
+      .required("Email is required"),
+    password: yup
+      .string()
+      .min(8, "Password should be of minimum 8 characters length")
+      .required("Password is required"),
+  });
+
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
     },
+    validationSchema: validationSchema,
     onSubmit: onSubmit,
   });
 
@@ -65,6 +79,8 @@ export const LoginPage = () => {
             label="Email"
             value={formik.values.email}
             onChange={formik.handleChange}
+            error={formik.touched.email && Boolean(formik.errors.email)}
+            helperText={formik.touched.email && formik.errors.email}
           />
           <TextField
             fullWidth
@@ -74,6 +90,8 @@ export const LoginPage = () => {
             type="password"
             value={formik.values.password}
             onChange={formik.handleChange}
+            error={formik.touched.password && Boolean(formik.errors.password)}
+            helperText={formik.touched.password && formik.errors.password}
           />
           <Button color="primary" variant="contained" fullWidth type="submit">
             Submit

@@ -7,7 +7,7 @@ namespace Domain
     {
         Car = 1,
         Painting = 2,
-        Vase = 3
+        Antiquity = 3
     }
 
     public  class Auction : IEntity

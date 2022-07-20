@@ -10,8 +10,8 @@ namespace Service.Extensions
             return new BidDetails
             {
                 Id = bid.Id,
-                BidAmount = bid.BidAmount,
-                BidDate = bid.BidDate,
+                Amount = bid.Amount,
+                Date = bid.Date,
                 BidderName = bid.Bidder.FullName
             };
         }
