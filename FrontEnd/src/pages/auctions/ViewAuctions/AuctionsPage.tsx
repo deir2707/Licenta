@@ -1,5 +1,11 @@
-import { Stack } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
+import { Pagination, Stack } from "@mui/material";
+import React, {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   HubConnection,
   HubConnectionBuilder,
@@ -10,23 +16,37 @@ import Api from "../../../Api";
 import { ApiEndpoints } from "../../../ApiEndpoints";
 import { AuctionItem } from "./Components";
 import { PageLayout } from "../../../components/PageLayout";
-import { AuctionDetails } from "../../../interfaces/AuctionInterfaces";
-import "./AuctionsPage.scss";
+import { AuctionOutput } from "../../../interfaces/AuctionInterfaces";
 import { NotificationEvents } from "../../../events/NotificationEvents";
 import { Notification } from "../../../events/Notification";
+import { ItemPagination } from "../../../interfaces/Pagination";
+import "./AuctionsPage.scss";
 
 export const AuctionsPage = () => {
-  const [auctions, setAuctions] = React.useState<AuctionDetails[]>([]);
+  const [auctions, setAuctions] = React.useState<AuctionOutput[]>([]);
+  const [currentPage, setCurrentPage] = React.useState<number>(1);
+  // const [pageSize, setPageSize] = React.useState<number>(10);
+  const [totalItems, setTotalItems] = React.useState<number>(0);
 
-  const loadAuctions = async () => {
-    Api.get<AuctionDetails[]>(ApiEndpoints.get_auctions).then(({ data }) => {
-      setAuctions(data);
+  const pageSize = 10;
+
+  const loadAuctions = useCallback(async () => {
+    Api.get<ItemPagination<AuctionOutput>>(
+      `${ApiEndpoints.get_auctions}/${currentPage}/${pageSize}`
+    ).then(({ data }) => {
+      setAuctions(data.items);
+      setTotalItems(data.totalItems);
     });
-  };
-
-  useEffect(() => {
-    loadAuctions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const handlePaginationChange = useCallback(
+    (_event: ChangeEvent<unknown>, page: number) => {
+      console.log(page);
+      setCurrentPage(page);
+    },
+    []
+  );
 
   const [connection, setConnection] = useState<HubConnection | null>(null);
 
@@ -47,22 +67,6 @@ export const AuctionsPage = () => {
         switch (notification.event) {
           case NotificationEvents.AuctionBid:
             loadAuctions();
-          // debugger;
-          // const data = notification.data as BidNotification;
-          // const auction = auctions.find(
-          //   (auction) => auction.id === data.auctionId
-          // );
-
-          // if (auction) {
-          //   const index = auctions.indexOf(auction);
-
-          //   auctions.splice(index, 1);
-
-          //   auction.currentPrice = data.bidAmount;
-          //   const newAuctions = [...auctions, auction];
-          //   debugger;
-          //   setAuctions(newAuctions);
-          // }
         }
       });
 
@@ -73,6 +77,15 @@ export const AuctionsPage = () => {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    Api.get<ItemPagination<AuctionOutput>>(
+      `${ApiEndpoints.get_auctions}/${currentPage}/${pageSize}`
+    ).then(({ data }) => {
+      setAuctions(data.items);
+      setTotalItems(data.totalItems);
+    });
+  }, [currentPage, pageSize]);
 
   useEffect(() => {
     listenToBids();
@@ -90,10 +103,12 @@ export const AuctionsPage = () => {
         <AuctionItem
           key={auction.id}
           id={auction.id}
-          name={auction.description}
+          title={auction.title}
           price={auction.currentPrice}
           description={auction.description}
-          images={auction.images}
+          image={auction.image}
+          endDate={auction.endDate}
+          noOfBids={auction.noOfBids}
         />
       );
     });
@@ -101,7 +116,16 @@ export const AuctionsPage = () => {
 
   return (
     <PageLayout>
-      <Stack className="auction-container">{auctionsShow}</Stack>
+      <div id="view-auctions">
+        <Pagination
+          className="auctions-pagination"
+          count={Math.ceil(totalItems / pageSize)}
+          shape="rounded"
+          variant="outlined"
+          onChange={handlePaginationChange}
+        />
+        <Stack className="auction-container">{auctionsShow}</Stack>
+      </div>
     </PageLayout>
   );
 };

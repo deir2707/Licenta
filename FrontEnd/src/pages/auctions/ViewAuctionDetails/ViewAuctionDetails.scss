@@ -1,0 +1,114 @@
+#view-auction-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 15px;
+  
+  .details-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    width: 85%;
+    
+    .base-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      background-color: #f5f5f5;
+      padding: 15px 0;
+
+      .title-price {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        padding: 0 25px;
+        
+        .title {
+          font-size: 20px;
+          font-weight: bold;
+          text-decoration: none;
+          color: inherit;
+        }
+      }
+
+      .images-container{
+        width: 800px;
+        height: 600px;
+      }
+
+      .description {
+        margin-top: 10px;
+        padding: 20px;
+        font-size: 16px;
+        font-weight: normal;
+        text-decoration: none;
+        color: inherit;
+        border: 1px solid #e0e0e0;
+      }
+    }
+
+    .other-details {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: 15px;
+      background-color: #f5f5f5;
+      padding: 15px;
+
+      .title  {
+        font-size: 18px;
+        font-weight: bold;
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .line{
+        display: flex;
+        width: 100%;
+        justify-content: flex-start;
+        padding: 0 25px;
+      }
+      .col {
+        width: 50%;
+      }
+    }
+  }
+
+  .bids-container {
+    background-color: #f5f5f5;
+    padding: 15px 25px;
+    flex-grow: 1;
+
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .bids {
+      .bid {
+        display: flex;
+        width: 100%;
+        justify-content: space-between;
+        
+        .bidder-name {
+          font-size: 16px;
+          font-weight: bold;
+          text-decoration: none;
+          color: inherit;
+        }
+        .bid-amount{
+          font-size: 16px;
+          font-weight: normal;
+          text-decoration: none;
+          color: inherit;
+        }
+      }
+    }
+  }
+
+}

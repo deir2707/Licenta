@@ -22,7 +22,8 @@ namespace Service
         private readonly INotificationPublisher _notificationPublisher;
         private readonly ICurrentUserProvider _currentUserProvider;
 
-        public AuctionService(AuctionContext auctionContext, INotificationPublisher notificationPublisher, ICurrentUserProvider currentUserProvider)
+        public AuctionService(AuctionContext auctionContext, INotificationPublisher notificationPublisher,
+            ICurrentUserProvider currentUserProvider)
         {
             _auctionContext = auctionContext;
             _notificationPublisher = notificationPublisher;
@@ -37,6 +38,7 @@ namespace Service
 
             var auction = new Auction
             {
+                Title = carInput.Title,
                 StartingPrice = carInput.StartPrice,
                 Description = carInput.Description,
                 StartDate = DateTime.UtcNow,
@@ -53,10 +55,36 @@ namespace Service
             return auction.Id;
         }
 
-        public async Task<List<AuctionDetails>> GetAllAuctionDetails()
+        public async Task<AuctionDetails> GetAuctionDetails(int id)
         {
-            var auctions = await GetAllAuctions();
-            return auctions.Select(a => a.ToAuctionDetails()).ToList();
+            var auction = await _auctionContext.Auctions
+                .Include(a => a.Images)
+                .Include(a => a.Bids).ThenInclude(b=>b.Bidder)
+                .FirstOrDefaultAsync(a => a.Id == id);
+            return auction.ToAuctionDetails();
+        }
+
+        public async Task<PaginationOutput<AuctionOutput>> GetAllAuctionDetails(int page, int pageSize)
+        {
+            var query = _auctionContext.Auctions
+                .Where(a => a.EndDate > DateTime.UtcNow)
+                .OrderBy(a => a.EndDate)
+                .Include(a => a.Images)
+                .Include(a => a.Bids);
+
+            var totalCount = await query.CountAsync();
+
+            var auctions = await query.Page(page, pageSize).ToListAsync();
+
+            var auctionDetails = auctions.Select(a => a.ToAuctionOutput()).ToList();
+
+            return new PaginationOutput<AuctionOutput>
+            {
+                Items = auctionDetails,
+                TotalItems = totalCount,
+                Page = page,
+                PageSize = pageSize
+            };
         }
 
         public async Task<int> MakeBid(BidInput bidInput)
@@ -64,7 +92,7 @@ namespace Service
             var auction = await GetAuction(bidInput.AuctionId);
 
             ValidateAuction(auction);
-            
+
             var highestBid = auction.Bids.Where(b => b.AuctionId == bidInput.AuctionId)
                 .OrderByDescending(b => b.BidAmount).FirstOrDefault();
 
@@ -76,7 +104,7 @@ namespace Service
                 BidAmount = bidInput.BidAmount,
                 BidderId = _currentUserProvider.UserId,
             };
-            
+
             _currentUserProvider.User.Balance -= bidInput.BidAmount;
 
             await _auctionContext.Bids.AddAsync(bid);
@@ -101,7 +129,7 @@ namespace Service
             {
                 throw new AuctionException(ErrorCode.AuctionEnded, "Auction has ended");
             }
-            
+
             if (auction.SellerId == _currentUserProvider.UserId)
             {
                 throw new AuctionException(ErrorCode.BidOnOwnAuction, "You cannot bid on your own auction");
@@ -114,7 +142,7 @@ namespace Service
             {
                 throw new AuctionException(ErrorCode.InsufficientBalance, "Insufficient balance");
             }
-            
+
             if (highestBid == null)
             {
                 if (bidInput.BidAmount <= auction.StartingPrice)
@@ -149,7 +177,7 @@ namespace Service
 
         private static List<Image> ExtractImages(List<IFormFile> images)
         {
-            return images.Select(img =>
+            return images?.Select(img =>
             {
                 var fileName = Path.GetFileName(img.FileName);
                 var fileExtension = Path.GetExtension(img.FileName);
@@ -183,12 +211,20 @@ namespace Service
             return auction;
         }
 
-        private async Task<List<Auction>> GetAllAuctions()
+        private async Task<List<Auction>> GetAllAuctions(int? size = null, int? page = null)
         {
-            return await _auctionContext.Auctions
+            var query = _auctionContext.Auctions
+                .Where(a => a.EndDate > DateTime.UtcNow)
+                .OrderBy(a => a.EndDate)
                 .Include(a => a.Images)
-                .Include(a=>a.Bids)
-                .ToListAsync();
+                .Include(a => a.Bids);
+
+            if (!size.HasValue || !page.HasValue)
+            {
+                return await query.ToListAsync();
+            }
+
+            return await query.Skip((page.Value - 1) * size.Value).Take(size.Value).ToListAsync();
         }
     }
 }

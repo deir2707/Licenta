@@ -6,7 +6,7 @@ import Api from '../Api';
 import { ApiEndpoints } from '../ApiEndpoints';
 import { UserContext } from '../context/UserContext';
 import { useApiError } from '../hooks/useApiError';
-import { RegisterInput, UserDto } from "../interfaces/UsersInterfaces";
+import { RegisterInput, UserDetails } from "../interfaces/UsersInterfaces";
 
 export const RegisterPage = () => {
   const navigate = useNavigate();
@@ -24,7 +24,7 @@ export const RegisterPage = () => {
       fullname: values.fullname,
     };
 
-    Api.post<RegisterInput, UserDto>(
+    Api.post<RegisterInput, UserDetails>(
       `${ApiEndpoints.users}/register`,
       registerModel
     )

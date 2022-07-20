@@ -2,18 +2,24 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { NoImage } from "../../../components/NoImage";
 import { Image } from "../../../components/Image";
+import Moment from "react-moment";
+import { Divider } from "@mui/material";
 
 export interface AuctionItemProps {
   id: number;
-  name: string;
+  title: string;
   price: number;
   description: string;
-  images: string[];
+  image: string;
+  endDate: Date;
+  noOfBids: number;
 }
 
 export const AuctionItem = (props: AuctionItemProps) => {
-  const { id, name, price, description, images } = props;
+  const { id, title, price, description, image, endDate, noOfBids } = props;
   const navigate = useNavigate();
+
+  const now = new Date();
 
   const handleOnClick = useCallback(() => {
     navigate(`/auctions/${id}`);
@@ -21,18 +27,34 @@ export const AuctionItem = (props: AuctionItemProps) => {
 
   return (
     <div className="auction-item" onClick={handleOnClick}>
-      {images[0] ? (
-        <Image src={images[0]} alt={name} className="thumbnail" />
-      ) : (
-        <NoImage className="thumbnail" />
-      )}
-      <div className="details-container">
-        <div className="title">name: {name.split(" ")[0]} </div>
-        <div className="body">
-          <p>price: {price}</p>
-          <p>description: {description}</p>
-          <p>current price: {price}</p>
+      <div className="auction-item-image">
+        {image ? <Image src={image} alt={title} /> : <NoImage />}
+      </div>
+      <Divider orientation="vertical" flexItem />
+      <div className="details">
+        <div className="title">{title.split(" ")[0]}</div>
+        <div>{description}</div>
+        <div>
+          <strong>Bids:</strong> {noOfBids} |{" "}
+          {noOfBids === 0 ? (
+            <span>
+              <strong>Starting price:</strong> {price} €
+            </span>
+          ) : (
+            <span>
+              <strong>Current Bid:</strong> {price} €
+            </span>
+          )}
         </div>
+      </div>
+      <Divider orientation="vertical" flexItem />
+      <div className="expiration">
+        <strong>Ends in:</strong>
+        <Moment
+          duration={now}
+          date={endDate}
+          format="D [days,] H [hours and] m [minutes]"
+        />
       </div>
     </div>
   );

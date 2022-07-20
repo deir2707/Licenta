@@ -66,6 +66,7 @@ export const AddAuctionPage = () => {
   ) => {
     const formdata = new FormData();
 
+    formdata.append("Title", values.Title);
     formdata.append("StartPrice", values.StartPrice);
     formdata.append("Make", values.Make);
     formdata.append("Model", values.Model);
@@ -96,6 +97,7 @@ export const AddAuctionPage = () => {
   };
 
   const initialValues: CarInput = {
+    Title: "",
     StartPrice: "",
     Make: "",
     Model: "",
@@ -140,6 +142,12 @@ export const AddAuctionPage = () => {
             name="StartPrice"
             label="Start Price"
             type="number"
+            onChange={formik.handleChange}
+          />
+          <TextField
+            id="Title"
+            name="Title"
+            label="Title"
             onChange={formik.handleChange}
           />
           <TextField

@@ -23,10 +23,17 @@ namespace BackEnd.Controllers
                 return Ok(response);
             }
             
-            [HttpGet]
-            public async Task<IActionResult> GetAllAuctions()
+            [HttpGet("{page:int}/{pageSize:int}")]
+            public async Task<IActionResult> GetAllAuctions(int page, int pageSize)
             {
-                var response = await _auctionService.GetAllAuctionDetails();
+                var response = await _auctionService.GetAllAuctionDetails(page, pageSize);
+                return Ok(response);
+            }
+            
+            [HttpGet("{id:int}")]
+            public async Task<IActionResult> GetAllAuctions(int id)
+            {
+                var response = await _auctionService.GetAuctionDetails(id);
                 return Ok(response);
             }
             

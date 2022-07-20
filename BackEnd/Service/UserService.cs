@@ -41,10 +41,10 @@ namespace Service
             return x.Id;
         }
 
-        public UserDTO GetUserDTO(int id)
+        public UserDetails GetUserDTO(int id)
         {
             var user = _currentUserProvider.User;
-            return user.ToUserDto();
+            return user.ToUserDetails();
         }
 
         private async Task<User> FetchUserByEmail(string email)
@@ -53,7 +53,7 @@ namespace Service
                 .FirstOrDefaultAsync(u => u.Email.Equals(email));
         }
 
-        public async Task<UserDTO> Login(LoginInput loginInput)
+        public async Task<UserDetails> Login(LoginInput loginInput)
         {
             var user = await FetchUserByEmail(loginInput.Email);
             
@@ -62,7 +62,7 @@ namespace Service
             if (!user.Password.Equals(loginInput.Password))
                 throw new AuctionException(ErrorCode.UserNotFound, "Invalid credentials");
             
-            return user.ToUserDto();
+            return user.ToUserDetails();
         }
 
         private void ValidateUser(User user)

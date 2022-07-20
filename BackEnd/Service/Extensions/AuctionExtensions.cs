@@ -6,6 +6,24 @@ namespace Service.Extensions
 {
     public static class AuctionExtensions
     {
+        public static AuctionOutput ToAuctionOutput(this Auction auction)
+        {
+            var highestBid = auction.Bids.OrderByDescending(b => b.BidAmount).FirstOrDefault();
+            
+            return new AuctionOutput
+            {
+                Id = auction.Id,
+                Title = auction.Title,
+                Description = auction.Description,
+                StartDate = auction.StartDate,
+                EndDate = auction.EndDate,
+                Image = auction.Images.Select(i => i.DataFiles).FirstOrDefault(),
+                StartingPrice = auction.StartingPrice,
+                Type = auction.Type,
+                NoOfBids = auction.Bids.Count,
+                CurrentPrice = highestBid?.BidAmount ?? auction.StartingPrice
+            };
+        }
         public static AuctionDetails ToAuctionDetails(this Auction auction)
         {
             var highestBid = auction.Bids.OrderByDescending(b => b.BidAmount).FirstOrDefault();
@@ -13,6 +31,7 @@ namespace Service.Extensions
             return new AuctionDetails
             {
                 Id = auction.Id,
+                Title = auction.Title,
                 Description = auction.Description,
                 StartDate = auction.StartDate,
                 EndDate = auction.EndDate,
@@ -20,7 +39,9 @@ namespace Service.Extensions
                 OtherDetails = auction.OtherDetails,
                 StartingPrice = auction.StartingPrice,
                 Type = auction.Type,
-                CurrentPrice = highestBid?.BidAmount ?? auction.StartingPrice
+                NoOfBids = auction.Bids.Count,
+                CurrentPrice = highestBid?.BidAmount ?? auction.StartingPrice,
+                Bids = auction.Bids.Select(b=>b.ToBidDetails()).ToList()
             };
         }
     }

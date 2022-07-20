@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Repository;
 
 namespace Repository.Migrations
 {
     [DbContext(typeof(AuctionContext))]
-    partial class AuctionContextModelSnapshot : ModelSnapshot
+    [Migration("20220719222100_AddTitleToAuction")]
+    partial class AddTitleToAuction
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -101,9 +103,6 @@ namespace Repository.Migrations
 
                     b.Property<int>("BidAmount")
                         .HasColumnType("int");
-
-                    b.Property<DateTime>("BidDate")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("BidderId")
                         .HasColumnType("int");

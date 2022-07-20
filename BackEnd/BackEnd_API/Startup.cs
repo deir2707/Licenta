@@ -48,7 +48,7 @@ namespace BackEnd
 
             services.AddSingleton<INotificationPublisher, AuctionHub>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-            
+
             services.AddScoped<ICurrentUserProvider, CurrentUserProvider>();
 
             services.AddHostedService<AuctionFinishService>();

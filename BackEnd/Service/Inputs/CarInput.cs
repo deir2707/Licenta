@@ -8,6 +8,7 @@ namespace Service.Inputs
         // [Required]
         // [RegularExpression("([0-9]+)")]
         public int StartPrice { get; set; }
+        public string Title { get; set; }
         public string Make { get; set; }
         public string Model { get; set; }
         public int Year { get; set; }

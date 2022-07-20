@@ -5,9 +5,9 @@ namespace Service.Extensions
 {
     public static class UserExtensions
     {
-        public static UserDTO ToUserDto(this User user)
+        public static UserDetails ToUserDetails(this User user)
         {
-            return new UserDTO
+            return new UserDetails
             {
                 Id = user.Id,
                 Email = user.Email,

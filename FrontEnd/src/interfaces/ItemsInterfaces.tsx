@@ -1,4 +1,5 @@
 export interface CarInput {
+  Title: string;
   Make: string;
   Model: string;
   Year: string;

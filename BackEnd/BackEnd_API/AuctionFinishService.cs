@@ -4,7 +4,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain;
 using Infrastructure.Notifications;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Repository;
