@@ -23,7 +23,7 @@ export const RegisterPage = () => {
     const registerModel: RegisterInput = {
       email: values.email,
       password: values.password,
-      fullname: values.fullname,
+      fullName: values.fullName,
     };
 
     Api.post<RegisterInput, UserDetails>(
@@ -32,11 +32,11 @@ export const RegisterPage = () => {
     )
       .then(({ data }) => {
         localStorage.setItem("userId", data.id.toString());
-        localStorage.setItem("fullName", data.fullname);
+        localStorage.setItem("fullName", data.fullName);
         localStorage.setItem("email", data.email);
         localStorage.setItem("balance", data.balance.toString());
         setUserId(data.id);
-        setFullName(data.fullname);
+        setFullName(data.fullName);
         setEmail(data.email);
         setBalance(data.balance);
         navigate("/mainpage");
@@ -59,14 +59,14 @@ export const RegisterPage = () => {
       .string()
       .min(8, "Password should be of minimum 8 characters length")
       .required("Password is required"),
-    fullname: yup.string().required("Full name is required"),
+    fullName: yup.string().required("Full name is required"),
   });
 
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
-      fullname: "",
+      fullName: "",
     },
     validationSchema: validationSchema,
     onSubmit: onSubmit,
@@ -100,13 +100,13 @@ export const RegisterPage = () => {
           />
           <TextField
             fullWidth
-            id="fullname"
-            name="fullname"
+            id="fullName"
+            name="fullName"
             label="Full Name"
-            value={formik.values.fullname}
+            value={formik.values.fullName}
             onChange={formik.handleChange}
-            error={formik.touched.fullname && Boolean(formik.errors.fullname)}
-            helperText={formik.touched.fullname && formik.errors.fullname}
+            error={formik.touched.fullName && Boolean(formik.errors.fullName)}
+            helperText={formik.touched.fullName && formik.errors.fullName}
           />
           <Button color="primary" variant="contained" fullWidth type="submit">
             Submit

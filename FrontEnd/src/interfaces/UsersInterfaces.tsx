@@ -1,6 +1,6 @@
 export interface UserDetails {
   id: number;
-  fullname: string;
+  fullName: string;
   email: string;
   balance: number;
 }
@@ -13,5 +13,9 @@ export interface LoginInput {
 export interface RegisterInput {
   email: string;
   password: string;
-  fullname: string;
+  fullName: string;
+}
+
+export interface AddBalanceInput {
+  balanceToAdd: number;
 }

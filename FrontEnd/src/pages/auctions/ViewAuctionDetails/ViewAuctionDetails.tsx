@@ -1,9 +1,9 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Carousel from "react-material-ui-carousel";
 import { useParams } from "react-router-dom";
 import ArrowBackIosIcon from "@mui/icons-material/ArrowBackIos";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
-import { Divider } from "@mui/material";
+import { Button, Divider, TextField } from "@mui/material";
 import _ from "lodash";
 
 import Api from "../../../Api";
@@ -12,17 +12,34 @@ import { Image } from "../../../components/Image";
 import { PageLayout } from "../../../components/PageLayout";
 import { AuctionDetails } from "../../../interfaces/AuctionInterfaces";
 import "./ViewAuctionDetails.scss";
+import { BidInput } from "../../../interfaces/BidsInterfaces";
+import { useApiError } from "../../../hooks/useApiError";
 
 export const ViewAuctionDetails = () => {
   const { id } = useParams();
+  const { handleApiError } = useApiError();
   const [auction, setAuction] = useState<AuctionDetails>();
+  const [bidAmount, setBidAmount] = useState<number>(0);
+  const [status, setStatus] = useState<string>();
+
+  const loadAuction = useCallback(async () => {
+    Api.get<AuctionDetails>(`${ApiEndpoints.get_auctions}/${id}`)
+      .then(({ data }) => {
+        setAuction(data);
+      })
+      .catch((error) => {
+        handleApiError(error);
+      });
+  }, [handleApiError, id]);
 
   useEffect(() => {
-    Api.get<AuctionDetails>(`${ApiEndpoints.get_auctions}/${id}`).then(
-      ({ data }) => {
+    Api.get<AuctionDetails>(`${ApiEndpoints.get_auctions}/${id}`)
+      .then(({ data }) => {
         setAuction(data);
-      }
-    );
+      })
+      .catch((error) => {
+        handleApiError(error);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -35,8 +52,8 @@ export const ViewAuctionDetails = () => {
         {auction?.images?.map((image) => {
           return (
             <Image
-              width="800px"
-              height="600px"
+              width="770px"
+              height="514px"
               key={image}
               src={image}
               alt={auction?.title}
@@ -72,13 +89,37 @@ export const ViewAuctionDetails = () => {
         return (
           <div key={bid.id} className="bid">
             <div className="bidder-name">
-              <strong>{bid.bidderName ?? "unknown"}: </strong>
+              <strong>{bid.bidderName ?? "unknown"}</strong>
             </div>
             <div className="bid-amount">{bid.amount}</div>
           </div>
         );
       });
   }, [auction]);
+
+  const canNotSubmitBid = useMemo(() => {
+    if (!auction?.currentPrice) return false;
+
+    return bidAmount <= auction?.currentPrice;
+  }, [auction, bidAmount]);
+
+  const handleBidSubmit = useCallback(() => {
+    const bidInput: BidInput = {
+      auctionId: Number(id),
+      bidAmount,
+      date: new Date(),
+    };
+
+    Api.post<BidInput, number>(`${ApiEndpoints.make_bid}`, bidInput)
+      .then(({ data }) => {
+        console.log(data);
+        loadAuction();
+        setStatus("Bid successful");
+      })
+      .catch((error) => {
+        handleApiError(error, setStatus);
+      });
+  }, [bidAmount, handleApiError, id, loadAuction]);
 
   return (
     <PageLayout>
@@ -106,6 +147,36 @@ export const ViewAuctionDetails = () => {
           <div className="title">Bids</div>
           <Divider flexItem />
           <div className="bids">{bids}</div>
+          <Divider flexItem />
+          <div className="make-bid-container">
+            <TextField
+              id="make-bid-amount"
+              label="Amount"
+              type="number"
+              value={bidAmount}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value >= 0 && value <= 2147483647) {
+                  setBidAmount(value);
+                  setStatus(undefined);
+                }
+              }}
+            />
+            {canNotSubmitBid && (
+              <div className="error">
+                Bid amount must be greater than current price
+              </div>
+            )}
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleBidSubmit}
+              disabled={canNotSubmitBid}
+            >
+              Make bid
+            </Button>
+            {status && <div className="status">{status}</div>}
+          </div>
         </div>
       </div>
     </PageLayout>

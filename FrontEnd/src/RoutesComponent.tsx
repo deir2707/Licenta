@@ -6,14 +6,14 @@ import { AuctionsPage } from "./pages/auctions/ViewAuctions/AuctionsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MainPage } from "./pages/MainPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import { UsersPage } from "./pages/UsersPage";
+import { MyProfilePage } from "./pages/MyProfilePage";
 
 export const RoutesComponent = () => {
   return (
     <Routes>
       <Route path="/" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/users" element={<UsersPage />} />
+      <Route path="/my-profile" element={<MyProfilePage />} />
       <Route path="/mainpage" element={<MainPage />} />
       <Route path="/auctions" element={<AuctionsPage />} />
       <Route path="/auctions/:id" element={<ViewAuctionDetails />} />

@@ -59,45 +59,6 @@ namespace Service
         private Dictionary<string,string> ParseOtherDetails(AuctionInput auctionInput)
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(auctionInput.OtherDetails);
-            // switch (auctionInput.Type)
-            // {
-            //     case AuctionType.Car:
-            //     {
-            //         return JsonConvert.DeserializeObject<CarInput2>(auctionInput.OtherDetails);
-            //         break;
-            //     }
-            //     case AuctionType.Painting:
-            //         break;
-            //     case AuctionType.Vase:
-            //         break;
-            //     default:
-            //         throw new ArgumentOutOfRangeException();
-            // }
-        }
-
-        public async Task<int> CreateCarAuction(CarInput carInput)
-        {
-            var otherDetails = ExtractOtherDetails(carInput);
-
-            var images = ExtractImages(carInput.Images);
-
-            var auction = new Auction
-            {
-                Title = carInput.Title,
-                StartingPrice = carInput.StartPrice,
-                Description = carInput.Description,
-                StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(7),
-                Type = AuctionType.Car,
-                OtherDetails = otherDetails,
-                SellerId = _currentUserProvider.UserId,
-                Images = images
-            };
-
-            await _auctionContext.Auctions.AddAsync(auction);
-            await _auctionContext.SaveChangesAsync();
-
-            return auction.Id;
         }
 
         public async Task<AuctionDetails> GetAuctionDetails(int id)
@@ -222,7 +183,7 @@ namespace Service
 
         private static List<Image> ExtractImages(List<IFormFile> images)
         {
-            return images?.Select(img =>
+            return images.Select(img =>
             {
                 var fileName = Path.GetFileName(img.FileName);
                 var fileExtension = Path.GetExtension(img.FileName);

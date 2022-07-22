@@ -21,8 +21,10 @@ import { NotificationEvents } from "../../../events/NotificationEvents";
 import { Notification } from "../../../events/Notification";
 import { ItemPagination } from "../../../interfaces/Pagination";
 import "./AuctionsPage.scss";
+import { useApiError } from "../../../hooks/useApiError";
 
 export const AuctionsPage = () => {
+  const { handleApiError } = useApiError();
   const [auctions, setAuctions] = React.useState<AuctionOutput[]>([]);
   const [currentPage, setCurrentPage] = React.useState<number>(1);
   // const [pageSize, setPageSize] = React.useState<number>(10);
@@ -33,10 +35,15 @@ export const AuctionsPage = () => {
   const loadAuctions = useCallback(async () => {
     Api.get<ItemPagination<AuctionOutput>>(
       `${ApiEndpoints.get_auctions}/${currentPage}/${pageSize}`
-    ).then(({ data }) => {
-      setAuctions(data.items);
-      setTotalItems(data.totalItems);
-    });
+    )
+      .then(({ data }) => {
+        setCurrentPage(1);
+        setAuctions(data.items);
+        setTotalItems(data.totalItems);
+      })
+      .catch((error) => {
+        handleApiError(error);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -80,11 +87,15 @@ export const AuctionsPage = () => {
   useEffect(() => {
     Api.get<ItemPagination<AuctionOutput>>(
       `${ApiEndpoints.get_auctions}/${currentPage}/${pageSize}`
-    ).then(({ data }) => {
-      setAuctions(data.items);
-      setTotalItems(data.totalItems);
-    });
-  }, [currentPage, pageSize]);
+    )
+      .then(({ data }) => {
+        setAuctions(data.items);
+        setTotalItems(data.totalItems);
+      })
+      .catch((error) => {
+        handleApiError(error);
+      });
+  }, [currentPage, handleApiError, pageSize]);
 
   useEffect(() => {
     listenToBids();

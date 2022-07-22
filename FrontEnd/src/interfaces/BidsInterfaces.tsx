@@ -4,3 +4,9 @@ export interface BidDetails {
   date: Date;
   bidderName: string;
 }
+
+export interface BidInput {
+  auctionId: number;
+  bidAmount: number;
+  date: Date;
+}

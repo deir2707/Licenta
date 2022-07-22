@@ -32,11 +32,17 @@ namespace BackEnd.Controllers
         }
 
         [HttpGet("{id:int}")]
-        public Task<IActionResult> GetUser(int id)
+        public async Task<IActionResult> GetUser(int id)
         {
-            var userDto = _userService.GetUserDTO(id);
-            return Task.FromResult<IActionResult>(Ok(userDto));
+            var userDto = await _userService.GetUserDetails(id);
+            return Ok(userDto);
         }
-
+        
+        [HttpPost("add-balance")]
+        public async Task<IActionResult> AddBalance(AddBalanceInput addBalanceInput)
+        {
+            var addedId = await _userService.AddBalance(addBalanceInput);
+            return Ok(addedId);
+        }
     }
 }
