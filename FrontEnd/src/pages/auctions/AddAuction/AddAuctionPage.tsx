@@ -1,4 +1,4 @@
-import { Button, MenuItem, Select, TextField } from "@mui/material";
+import { Button, MenuItem, TextField } from "@mui/material";
 import { FormikHelpers, getIn, useFormik } from "formik";
 import _ from "lodash";
 import React, { useCallback, useMemo, useState } from "react";
@@ -191,16 +191,19 @@ export const AddAuctionPage = () => {
 
   const uploadButton = useMemo(() => {
     return (
-      <div>
+      <div className="upload-container">
         <Button variant="contained" component="label">
-          Upload <input type="file" onChange={onFileUpload} multiple hidden />
+          Upload photos
+          <input type="file" onChange={onFileUpload} multiple hidden />
         </Button>
 
-        {files && (
-          <Button onClick={clearFiles}>
-            Clear {files.length === 1 ? "1 file" : `${files.length} files`}
-          </Button>
-        )}
+        <div>
+          {files && (
+            <Button onClick={clearFiles}>
+              Clear {files.length === 1 ? "1 photo" : `${files.length} photos`}
+            </Button>
+          )}
+        </div>
       </div>
     );
   }, [clearFiles, files]);
@@ -232,64 +235,67 @@ export const AddAuctionPage = () => {
     items,
   ]);
 
-  console.log(formik.values.Type);
-
   return (
     <PageLayout>
       <div className="add-auction-container">
         <form onSubmit={formik.handleSubmit}>
           {formik.status && <div className="error">{formik.status}</div>}
-          <TextField
-            id="StartPrice"
-            name="StartPrice"
-            label="Start Price"
-            type="number"
-            value={formik.values.StartPrice}
-            onChange={formik.handleChange}
-            error={
-              formik.touched.StartPrice && Boolean(formik.errors.StartPrice)
-            }
-            helperText={formik.touched.StartPrice && formik.errors.StartPrice}
-          />
-          <TextField
-            id="Title"
-            name="Title"
-            label="Title"
-            value={formik.values.Title}
-            onChange={formik.handleChange}
-            error={formik.touched.Title && Boolean(formik.errors.Title)}
-            helperText={formik.touched.Title && formik.errors.Title}
-          />
-          <TextField
-            id="Description"
-            name="Description"
-            label="Description"
-            value={formik.values.Description}
-            multiline
-            onChange={formik.handleChange}
-            error={
-              formik.touched.Description && Boolean(formik.errors.Description)
-            }
-            helperText={formik.touched.Description && formik.errors.Description}
-          />
-          <Select
-            id="Type"
-            name="Type"
-            label="Type"
-            onChange={formik.handleChange}
-            value={formik.values.Type}
-            children={Object.keys(AuctionType)
-              .filter((x) => Number(x) >= 0)
-              .map((key) => (
-                <MenuItem key={key} value={key}>
-                  {AuctionType[Number(key)]}
-                </MenuItem>
-              ))}
-          />
+          <div className="form">
+            <TextField
+              id="StartPrice"
+              name="StartPrice"
+              label="Start Price"
+              type="number"
+              value={formik.values.StartPrice}
+              onChange={formik.handleChange}
+              error={
+                formik.touched.StartPrice && Boolean(formik.errors.StartPrice)
+              }
+              helperText={formik.touched.StartPrice && formik.errors.StartPrice}
+            />
+            <TextField
+              id="Title"
+              name="Title"
+              label="Title"
+              value={formik.values.Title}
+              onChange={formik.handleChange}
+              error={formik.touched.Title && Boolean(formik.errors.Title)}
+              helperText={formik.touched.Title && formik.errors.Title}
+            />
+            <TextField
+              id="Description"
+              name="Description"
+              label="Description"
+              value={formik.values.Description}
+              multiline
+              onChange={formik.handleChange}
+              error={
+                formik.touched.Description && Boolean(formik.errors.Description)
+              }
+              helperText={
+                formik.touched.Description && formik.errors.Description
+              }
+            />
+            <TextField
+              id="Type"
+              name="Type"
+              onChange={formik.handleChange}
+              value={formik.values.Type}
+              select
+              label="Type"
+            >
+              {Object.keys(AuctionType)
+                .filter((x) => Number(x) >= 0)
+                .map((key) => (
+                  <MenuItem key={key} value={key}>
+                    {AuctionType[Number(key)]}
+                  </MenuItem>
+                ))}
+            </TextField>
+            {customFields}
+            {uploadButton}
+          </div>
 
-          {customFields}
-
-          {uploadButton}
           <Button variant="contained" color="primary" type="submit">
             Add auction
           </Button>

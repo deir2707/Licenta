@@ -30,6 +30,20 @@ namespace BackEnd.Controllers
                 return Ok(response);
             }
             
+            [HttpGet("my-auctions")]
+            public async Task<IActionResult> GetMyAuctions()
+            {
+                var response = await _auctionService.GetMyAuctions();
+                return Ok(response);
+            }
+            
+            [HttpGet("won-auctions")]
+            public async Task<IActionResult> GetWonAuctions()
+            {
+                var response = await _auctionService.GetWonAuctions();
+                return Ok(response);
+            }
+            
             [HttpGet("{id:int}")]
             public async Task<IActionResult> GetAllAuctions(int id)
             {

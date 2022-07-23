@@ -17,6 +17,7 @@ export interface AuctionOutput {
   endDate: Date;
   noOfBids: number;
   currentPrice: number;
+  isFinished: boolean;
 }
 
 export interface AuctionDetails {
@@ -32,6 +33,8 @@ export interface AuctionDetails {
   currentPrice: number;
   noOfBids: number;
   bids: BidDetails[];
+  isFinished: boolean;
+  sellerId: number;
 }
 
 export interface AddAuctionInput {

@@ -1,51 +1,52 @@
-import { Pagination, Stack } from "@mui/material";
-import React, {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
-import {
-  HubConnection,
-  HubConnectionBuilder,
-  LogLevel,
-} from "@microsoft/signalr";
+import { Pagination } from "@mui/material";
+import React, { ChangeEvent, useCallback, useEffect } from "react";
+import PubSub from "pubsub-js";
 
 import Api from "../../../Api";
 import { ApiEndpoints } from "../../../ApiEndpoints";
-import { AuctionItem } from "./Components";
 import { PageLayout } from "../../../components/PageLayout";
 import { AuctionOutput } from "../../../interfaces/AuctionInterfaces";
-import { NotificationEvents } from "../../../events/NotificationEvents";
-import { Notification } from "../../../events/Notification";
 import { ItemPagination } from "../../../interfaces/Pagination";
 import "./AuctionsPage.scss";
 import { useApiError } from "../../../hooks/useApiError";
+import { PubSubEvents } from "../../../services/notifications/PubSubEvents";
+import dateService from "../../../services/DateService";
+import { AuctionFinishedNotification } from "../../../events/AuctionFinishedNotification";
+import { AuctionNotification } from "../../../events/AuctionNotification";
+import { AuctionsList } from "../../../components/auctions-list/AuctionsList";
 
 export const AuctionsPage = () => {
   const { handleApiError } = useApiError();
   const [auctions, setAuctions] = React.useState<AuctionOutput[]>([]);
   const [currentPage, setCurrentPage] = React.useState<number>(1);
-  // const [pageSize, setPageSize] = React.useState<number>(10);
   const [totalItems, setTotalItems] = React.useState<number>(0);
 
   const pageSize = 10;
 
-  const loadAuctions = useCallback(async () => {
-    Api.get<ItemPagination<AuctionOutput>>(
-      `${ApiEndpoints.get_auctions}/${currentPage}/${pageSize}`
-    )
-      .then(({ data }) => {
-        setCurrentPage(1);
-        setAuctions(data.items);
-        setTotalItems(data.totalItems);
-      })
-      .catch((error) => {
-        handleApiError(error);
-      });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const loadAuctions = useCallback(
+    async (resetToFirstPage: boolean = true) => {
+      Api.get<ItemPagination<AuctionOutput>>(
+        `${ApiEndpoints.get_auctions}/${currentPage}/${pageSize}`
+      )
+        .then(({ data }) => {
+          resetToFirstPage && setCurrentPage(1);
+
+          const items = data.items.map((item) => ({
+            ...item,
+            endDate: dateService.convertUTCDateToLocalDate(
+              new Date(item.endDate)
+            ),
+          }));
+
+          setAuctions(items);
+          setTotalItems(data.totalItems);
+        })
+        .catch((error) => {
+          handleApiError(error);
+        });
+    },
+    [currentPage, handleApiError]
+  );
 
   const handlePaginationChange = useCallback(
     (_event: ChangeEvent<unknown>, page: number) => {
@@ -53,76 +54,68 @@ export const AuctionsPage = () => {
     },
     []
   );
+  const handleAuctionFinished = useCallback(
+    (notification: AuctionNotification) => {
+      const auctionFinished = notification.data as AuctionFinishedNotification;
 
-  const [connection, setConnection] = useState<HubConnection | null>(null);
+      const auctionId = auctionFinished.auctionId;
 
-  const listenToBids = async () => {
-    try {
-      const connection = new HubConnectionBuilder()
-        .withUrl("https://localhost:5001/hub/auctionHub")
-        .configureLogging(LogLevel.Error)
-        .withAutomaticReconnect()
-        .build();
+      const newAuctions = auctions.filter(
+        (auction) => auction.id !== auctionId
+      );
+      let finishedAuction = auctions.find(
+        (auction) => auction.id === auctionId
+      );
 
-      connection.onclose(() => {
-        console.log("Connection closed");
-      });
+      if (finishedAuction) {
+        finishedAuction = {
+          ...finishedAuction,
+          isFinished: true,
+        };
 
-      connection.on("onPublishMessage", (notification: Notification) => {
-        console.log(notification.data);
-        switch (notification.event) {
-          case NotificationEvents.AuctionBid:
-            loadAuctions();
-        }
-      });
-
-      await connection.start();
-      console.log("Connection started");
-      setConnection(connection);
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  useEffect(() => {
-    Api.get<ItemPagination<AuctionOutput>>(
-      `${ApiEndpoints.get_auctions}/${currentPage}/${pageSize}`
-    )
-      .then(({ data }) => {
-        setAuctions(data.items);
-        setTotalItems(data.totalItems);
-      })
-      .catch((error) => {
-        handleApiError(error);
-      });
-  }, [currentPage, handleApiError, pageSize]);
-
-  useEffect(() => {
-    listenToBids();
-    return () => {
-      if (connection) {
-        connection.stop();
+        newAuctions.push(finishedAuction);
+        newAuctions.sort((a, b) => {
+          return a.endDate.getTime() - b.endDate.getTime();
+        });
       }
+
+      setAuctions(newAuctions);
+    },
+    [auctions]
+  );
+
+  useEffect(() => {
+    const load = async () => {
+      await loadAuctions();
     };
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const auctionsShow = useMemo(() => {
-    return auctions.map((auction) => {
-      return (
-        <AuctionItem
-          key={auction.id}
-          id={auction.id}
-          title={auction.title}
-          price={auction.currentPrice}
-          description={auction.description}
-          image={auction.image}
-          endDate={auction.endDate}
-          noOfBids={auction.noOfBids}
-        />
-      );
+  useEffect(() => {
+    loadAuctions(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage]);
+
+  useEffect(() => {
+    PubSub.subscribe(PubSubEvents.AuctionBid, async () => {
+      await loadAuctions();
     });
-  }, [auctions]);
+
+    return () => {
+      PubSub.unsubscribe(PubSubEvents.AuctionBid);
+    };
+  }, [loadAuctions]);
+
+  useEffect(() => {
+    PubSub.subscribe(PubSubEvents.AuctionFinished, async (event, data) => {
+      handleAuctionFinished(data as unknown as AuctionNotification);
+    });
+
+    return () => {
+      PubSub.unsubscribe(PubSubEvents.AuctionFinished);
+    };
+  }, [handleAuctionFinished]);
 
   return (
     <PageLayout>
@@ -134,7 +127,7 @@ export const AuctionsPage = () => {
           variant="outlined"
           onChange={handlePaginationChange}
         />
-        <Stack className="auction-container">{auctionsShow}</Stack>
+        <AuctionsList auctions={auctions} />
       </div>
     </PageLayout>
   );

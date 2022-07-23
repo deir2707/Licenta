@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Divider } from "@mui/material";
+
 import { NoImage } from "../../../components/NoImage";
 import { Image } from "../../../components/Image";
-import Moment from "react-moment";
-import { Divider } from "@mui/material";
 import dateService from "../../../services/DateService";
 
 export interface AuctionItemProps {
@@ -14,16 +14,26 @@ export interface AuctionItemProps {
   image: string;
   endDate: Date;
   noOfBids: number;
+  isFinished: boolean;
 }
 
 export const AuctionItem = (props: AuctionItemProps) => {
-  const { id, title, price, description, image, endDate, noOfBids } = props;
+  const {
+    id,
+    title,
+    price,
+    description,
+    image,
+    endDate,
+    noOfBids,
+    isFinished,
+  } = props;
   const navigate = useNavigate();
 
   const [timeLeft, setTimeLeft] = useState(dateService.getDuration(endDate));
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    setTimeout(() => {
       setTimeLeft(dateService.getDuration(endDate));
     }, 1000);
   });
@@ -32,8 +42,12 @@ export const AuctionItem = (props: AuctionItemProps) => {
     navigate(`/auctions/${id}`);
   }, [id, navigate]);
 
+  const isFinishedClass = useMemo(() => {
+    return isFinished ? " finished" : "";
+  }, [isFinished]);
+
   return (
-    <div className="auction-item" onClick={handleOnClick}>
+    <div className={`auction-item${isFinishedClass}`} onClick={handleOnClick}>
       <div className="auction-item-image">
         {image ? <Image src={image} alt={title} /> : <NoImage />}
       </div>
@@ -56,8 +70,14 @@ export const AuctionItem = (props: AuctionItemProps) => {
       </div>
       <Divider orientation="vertical" flexItem />
       <div className="expiration">
-        <strong>Ends in:</strong>
-        {dateService.durationToString(timeLeft)}
+        {!isFinished ? (
+          <>
+            <strong>Ends in:</strong>
+            {dateService.durationToString(timeLeft)}
+          </>
+        ) : (
+          <span> Finished</span>
+        )}
       </div>
     </div>
   );

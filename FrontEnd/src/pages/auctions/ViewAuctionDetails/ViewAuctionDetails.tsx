@@ -11,12 +11,13 @@ import { ApiEndpoints } from "../../../ApiEndpoints";
 import { Image } from "../../../components/Image";
 import { PageLayout } from "../../../components/PageLayout";
 import { AuctionDetails } from "../../../interfaces/AuctionInterfaces";
-import "./ViewAuctionDetails.scss";
 import { BidInput } from "../../../interfaces/BidsInterfaces";
 import { useApiError } from "../../../hooks/useApiError";
+import "./ViewAuctionDetails.scss";
 
 export const ViewAuctionDetails = () => {
   const { id } = useParams();
+  const userId = Number(localStorage.getItem("userId"));
   const { handleApiError } = useApiError();
   const [auction, setAuction] = useState<AuctionDetails>();
   const [bidAmount, setBidAmount] = useState<number>(0);
@@ -97,11 +98,15 @@ export const ViewAuctionDetails = () => {
       });
   }, [auction]);
 
-  const canNotSubmitBid = useMemo(() => {
+  const bidTooSmall = useMemo(() => {
     if (!auction?.currentPrice) return false;
 
     return bidAmount <= auction?.currentPrice;
   }, [auction, bidAmount]);
+
+  const bidButtonDisabled = useMemo(() => {
+    return auction?.isFinished || auction?.sellerId === userId;
+  }, [auction?.isFinished, auction?.sellerId, userId]);
 
   const handleBidSubmit = useCallback(() => {
     const bidInput: BidInput = {
@@ -129,7 +134,10 @@ export const ViewAuctionDetails = () => {
             <div className="title-price">
               <div className="title">{auction?.title}</div>
               <div className="price">
-                <strong>Current price:</strong> {auction?.currentPrice} €
+                <strong>
+                  {auction?.isFinished ? "Final price" : "Current price"}:
+                </strong>{" "}
+                {auction?.currentPrice} €
               </div>
             </div>
             {auction?.images.length !== 0 && (
@@ -154,6 +162,7 @@ export const ViewAuctionDetails = () => {
               label="Amount"
               type="number"
               value={bidAmount}
+              disabled={bidButtonDisabled}
               onChange={(e) => {
                 const value = Number(e.target.value);
                 if (value >= 0 && value <= 2147483647) {
@@ -162,7 +171,7 @@ export const ViewAuctionDetails = () => {
                 }
               }}
             />
-            {canNotSubmitBid && (
+            {bidTooSmall && !bidButtonDisabled && (
               <div className="error">
                 Bid amount must be greater than current price
               </div>
@@ -171,7 +180,7 @@ export const ViewAuctionDetails = () => {
               variant="contained"
               color="primary"
               onClick={handleBidSubmit}
-              disabled={canNotSubmitBid}
+              disabled={bidTooSmall || bidButtonDisabled}
             >
               Make bid
             </Button>

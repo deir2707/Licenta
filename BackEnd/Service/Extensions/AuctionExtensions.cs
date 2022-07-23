@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Domain;
 using Service.Outputs;
 
@@ -21,7 +22,8 @@ namespace Service.Extensions
                 StartingPrice = auction.StartingPrice,
                 Type = auction.Type,
                 NoOfBids = auction.Bids.Count,
-                CurrentPrice = highestBid?.Amount ?? auction.StartingPrice
+                CurrentPrice = highestBid?.Amount ?? auction.StartingPrice,
+                IsFinished = auction.EndDate < DateTime.UtcNow
             };
         }
         public static AuctionDetails ToAuctionDetails(this Auction auction)
@@ -41,7 +43,9 @@ namespace Service.Extensions
                 Type = auction.Type,
                 NoOfBids = auction.Bids.Count,
                 CurrentPrice = highestBid?.Amount ?? auction.StartingPrice,
-                Bids = auction.Bids.Select(b=>b.ToBidDetails()).ToList()
+                Bids = auction.Bids.Select(b=>b.ToBidDetails()).ToList(),
+                IsFinished = auction.EndDate < DateTime.UtcNow,
+                SellerId = auction.SellerId
             };
         }
     }

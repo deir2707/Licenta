@@ -6,7 +6,7 @@ import { AuctionsPage } from "./pages/auctions/ViewAuctions/AuctionsPage";
 import { LoginPage } from "./pages/LoginPage";
 import { MainPage } from "./pages/MainPage";
 import { RegisterPage } from "./pages/RegisterPage";
-import { MyProfilePage } from "./pages/MyProfilePage";
+import { MyProfilePage } from "./pages/my-profile/MyProfilePage";
 
 export const RoutesComponent = () => {
   return (

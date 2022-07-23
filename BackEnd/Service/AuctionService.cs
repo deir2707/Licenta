@@ -73,6 +73,7 @@ namespace Service
         public async Task<PaginationOutput<AuctionOutput>> GetAllAuctionDetails(int page, int pageSize)
         {
             var query = _auctionContext.Auctions
+                .Where(a => a.SellerId != _currentUserProvider.UserId)
                 .Where(a => a.EndDate > DateTime.UtcNow)
                 .OrderBy(a => a.EndDate)
                 .Include(a => a.Images)
@@ -129,6 +130,28 @@ namespace Service
             return bid.Id;
         }
 
+        public async Task<List<AuctionOutput>> GetMyAuctions()
+        {
+            return await _auctionContext.Auctions
+                .Where(a=>a.SellerId == _currentUserProvider.UserId)
+                .OrderByDescending(a => a.EndDate)
+                .Include(a => a.Images)
+                .Include(a => a.Bids)
+                .Select(a => a.ToAuctionOutput())
+                .ToListAsync();
+        }
+
+        public async Task<List<AuctionOutput>> GetWonAuctions()
+        {
+            return await _auctionContext.Auctions
+                .Where(a=>a.BuyerId == _currentUserProvider.UserId)
+                .OrderByDescending(a => a.EndDate)
+                .Include(a => a.Images)
+                .Include(a => a.Bids)
+                .Select(a => a.ToAuctionOutput())
+                .ToListAsync();
+        }
+        
         private void ValidateAuction(Auction auction)
         {
             if (auction.EndDate < DateTime.UtcNow)

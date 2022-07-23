@@ -32,9 +32,17 @@ export class DateService implements IDate {
     return formatedDate;
   };
 
-  ToTimezone = (date: Date, timezone: string): Date => {
-    const dateObject = moment(date).utcOffset(timezone);
-    return dateObject.toDate();
+  convertUTCDateToLocalDate = (date: Date): Date => {
+    var newDate = new Date(
+      date.getTime() + date.getTimezoneOffset() * 60 * 1000
+    );
+
+    var offset = date.getTimezoneOffset() / 60;
+    var hours = date.getHours();
+
+    newDate.setHours(hours - offset);
+
+    return newDate;
   };
 
   dateToUTC = (date: Date): Date => {
@@ -57,8 +65,7 @@ export class DateService implements IDate {
     const days = duration.days > 0 ? `${duration.days} days ` : "";
     const hours = duration.hours > 0 ? `${duration.hours} hours ` : "";
     const minutes = duration.minutes > 0 ? `${duration.minutes} minutes ` : "";
-    const seconds =
-      duration.seconds > 0 ? `and ${duration.seconds} seconds ` : "";
+    const seconds = duration.seconds > 0 ? `${duration.seconds} seconds ` : "";
 
     return `${days}${hours}${minutes}${seconds}`;
   };

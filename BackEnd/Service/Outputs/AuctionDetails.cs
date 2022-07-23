@@ -18,5 +18,7 @@ namespace Service.Outputs
         public int CurrentPrice { get; set; }
         public int NoOfBids { get; set; }
         public List<BidDetails> Bids { get; set; }
+        public bool IsFinished { get; set; }
+        public int SellerId { get; set; }
     }
 }

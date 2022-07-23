@@ -4,9 +4,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Domain;
 using Infrastructure.Notifications;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Repository;
+using Service.Outputs;
 
 namespace BackEnd
 {
@@ -36,13 +38,33 @@ namespace BackEnd
             return Task.CompletedTask;
         }
 
-        private Auction GetFirstAuctionToEnd()
+        private Auction? GetFirstAuctionToEnd()
         {
             using var scope = _scopeFactory.CreateScope();
 
-            var context = scope.ServiceProvider.GetRequiredService<AuctionContext>();
+            var context =  scope.ServiceProvider.GetRequiredService<AuctionContext>();
+            
             return context.Auctions.Where(a => a.EndDate > DateTime.UtcNow)
                 .OrderBy(a => a.EndDate).FirstOrDefault();
+        }
+
+        private void FinishAuction(int auctionId)
+        {
+            using var scope = _scopeFactory.CreateScope();
+
+            var context =  scope.ServiceProvider.GetRequiredService<AuctionContext>();
+            
+            var auction = context.Auctions
+                .Include(a => a.Bids).ThenInclude(b => b.Bidder)
+                .FirstOrDefault(a => a.Id == auctionId);
+
+            var highestBid = auction?.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
+
+            if (highestBid == null) return;
+            
+            if (auction != null) auction.Buyer = highestBid.Bidder;
+            
+            context.SaveChanges();
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -63,15 +85,25 @@ namespace BackEnd
             _notificationPublisher.PublishMessageToUser(new Notification
             {
                 Event = NotificationEvents.AuctionFinished,
-                Data = $"Auction {auction.Id} has finished",
+                Data = new AuctionFinishedNotification
+                {
+                    AuctionId = auction.Id
+                },
             });
+
+            FinishAuction(auction.Id);
 
             var nextAuctionToEnd = GetFirstAuctionToEnd();
 
             _timer = null;
-            
-            if (nextAuctionToEnd == null) return;
-            
+
+            if (nextAuctionToEnd == null)
+            {
+                _timer = new Timer(OnTimer, nextAuctionToEnd, TimeSpan.FromHours(1), Timeout.InfiniteTimeSpan);
+            }
+
+            ;
+
             _timer = new Timer(OnTimer, nextAuctionToEnd, nextAuctionToEnd.EndDate - DateTime.UtcNow,
                 Timeout.InfiniteTimeSpan);
         }
