@@ -17,10 +17,11 @@ import "./ViewAuctionDetails.scss";
 
 export const ViewAuctionDetails = () => {
   const { id } = useParams();
-  const userId = Number(localStorage.getItem("userId"));
+  const userId = localStorage.getItem("userId");
   const { handleApiError } = useApiError();
   const [auction, setAuction] = useState<AuctionDetails>();
   const [bidAmount, setBidAmount] = useState<number>(0);
+  const [bidAmountChanged, setBidAmountChanged] = useState<boolean>(false);
   const [status, setStatus] = useState<string>();
 
   const loadAuction = useCallback(async () => {
@@ -34,13 +35,7 @@ export const ViewAuctionDetails = () => {
   }, [handleApiError, id]);
 
   useEffect(() => {
-    Api.get<AuctionDetails>(`${ApiEndpoints.get_auctions}/${id}`)
-      .then(({ data }) => {
-        setAuction(data);
-      })
-      .catch((error) => {
-        handleApiError(error);
-      });
+    loadAuction();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -110,7 +105,7 @@ export const ViewAuctionDetails = () => {
 
   const handleBidSubmit = useCallback(() => {
     const bidInput: BidInput = {
-      auctionId: Number(id),
+      auctionId: id ?? "",
       bidAmount,
       date: new Date(),
     };
@@ -120,6 +115,7 @@ export const ViewAuctionDetails = () => {
         console.log(data);
         loadAuction();
         setStatus("Bid successful");
+        setBidAmountChanged(false);
       })
       .catch((error) => {
         handleApiError(error, setStatus);
@@ -166,12 +162,13 @@ export const ViewAuctionDetails = () => {
               onChange={(e) => {
                 const value = Number(e.target.value);
                 if (value >= 0 && value <= 2147483647) {
+                  setBidAmountChanged(true);
                   setBidAmount(value);
                   setStatus(undefined);
                 }
               }}
             />
-            {bidTooSmall && !bidButtonDisabled && (
+            {bidAmountChanged && bidTooSmall && !bidButtonDisabled && (
               <div className="error">
                 Bid amount must be greater than current price
               </div>

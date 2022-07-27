@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Domain;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
@@ -19,6 +20,22 @@ namespace Repository
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Auction>().HasKey(a => a.Id);
+            modelBuilder.Entity<User>().HasKey(u => u.Id);
+            modelBuilder.Entity<Bid>().HasKey(b => b.Id);
+            modelBuilder.Entity<Address>().HasKey(a => a.Id);
+            modelBuilder.Entity<Image>().HasKey(i => i.Id);
+            
+            modelBuilder.Entity<Image>()
+                .HasOne(i => i.Auction)
+                .WithMany(a => a.Images)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Bid>()
+                .HasOne(i => i.Auction)
+                .WithMany(a => a.Bids)
+                .OnDelete(DeleteBehavior.NoAction);
+
             modelBuilder.Entity<Bid>()
                 .HasOne(b=>b.Bidder)
                 .WithMany(u=>u.Bids)
@@ -38,14 +55,14 @@ namespace Repository
             modelBuilder.Entity<User>()
                 .HasData(new User
                 {
-                    Id = 1,
+                    Id = new Guid("00000000-0000-0000-0000-000000000001"),
                     Email = "user1@email.com",
                     Password = "password",
                     FullName = "User1"
                 },
-                    new User
+                new User
                 {
-                    Id = 2,
+                    Id = new Guid("00000000-0000-0000-0000-000000000002"),
                     Email = "user2@email.com",
                     Password = "password2",
                     FullName = "User2"

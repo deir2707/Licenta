@@ -13,48 +13,65 @@ const axiosConfig = {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    "User-Id": localStorage.getItem("userId") || "-1",
+    // "User-Id": localStorage.getItem("userId") || "-1",
   },
   paramsSerializer: (params: PathLike) =>
     qs.stringify(params, { indices: false }),
 };
 
 class ApiService {
-    private _api: AxiosInstance;
+  private _api: AxiosInstance;
 
-    constructor() {
-        this._api = axios.create(axiosConfig);
-    }
+  constructor() {
+    this._api = axios.create(axiosConfig);
+  }
 
-    public get<ResponseDataType, Response = AxiosResponse<ResponseDataType>>(
-        url: string,
-        config?: AxiosRequestConfig
-    ): Promise<Response> {
-        return this._api.get(url, config);
-    }
+  public get<ResponseDataType, Response = AxiosResponse<ResponseDataType>>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<Response> {
+    return this._api.get(url, this.getConfigWithUserId());
+  }
 
-    public post<RequestDataType, ResponseDataType, Response = AxiosResponse<ResponseDataType>>(
-        url: string,
-        data: RequestDataType,
-        config?: AxiosRequestConfig
-    ): Promise<Response> {
-        return this._api.post(url, data, config);
-    }
+  public post<
+    RequestDataType,
+    ResponseDataType,
+    Response = AxiosResponse<ResponseDataType>
+  >(
+    url: string,
+    data: RequestDataType,
+    config?: AxiosRequestConfig
+  ): Promise<Response> {
+    return this._api.post(url, data, this.getConfigWithUserId());
+  }
 
-    public put<RequestDataType, ResponseDataType, Response = AxiosResponse<ResponseDataType>>(
-        url: string,
-        data: RequestDataType,
-        config?: AxiosRequestConfig
-    ): Promise<Response> {
-        return this._api.put(url, data, config);
-    }
+  public put<
+    RequestDataType,
+    ResponseDataType,
+    Response = AxiosResponse<ResponseDataType>
+  >(
+    url: string,
+    data: RequestDataType,
+    config?: AxiosRequestConfig
+  ): Promise<Response> {
+    return this._api.put(url, data, this.getConfigWithUserId());
+  }
 
-    public delete<ResponseDataType, Response = AxiosResponse<ResponseDataType>>(
-        url: string,
-        config?: AxiosRequestConfig
-    ): Promise<Response> {
-        return this._api.delete(url, config);
-    }
+  public delete<ResponseDataType, Response = AxiosResponse<ResponseDataType>>(
+    url: string,
+    config?: AxiosRequestConfig
+  ): Promise<Response> {
+    return this._api.delete(url, this.getConfigWithUserId());
+  }
+
+  private getConfigWithUserId(): AxiosRequestConfig {
+    const config: AxiosRequestConfig = {
+      headers: {
+        "User-Id": localStorage.getItem("userId") || "-1",
+      },
+    };
+    return config;
+  }
 }
 
 export default new ApiService();

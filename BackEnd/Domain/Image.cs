@@ -1,17 +1,16 @@
-﻿namespace Domain
-{
+﻿using System;
+using Infrastructure.Mongo;
 
+namespace Domain
+{
+    [BsonCollection("images")]
     public class Image : IEntity
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         
-        public Auction auction { get; set; }
+        public Guid AuctionId { get; set; }
 
-        public int AuctionId { get; set; }
-
-        // public Auction Auction {get; set;}
-
-        // public ImageFile ImageFile {get; set;}
+        public Auction Auction { get; set; }
 
         public string ImageFileName { get; set; }
 

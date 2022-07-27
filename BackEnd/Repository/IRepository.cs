@@ -1,26 +1,30 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Domain;
 
 namespace Repository
 {
-    public abstract class IRepository<T> where T : class, IEntity
+    public interface IRepository<T> where T : class, IEntity
     {
-        private readonly AuctionContext _dbContext;
-
-        protected IRepository(AuctionContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
-        public AuctionContext DbContext => _dbContext;
-        public abstract Task<T> GetById(int id);
-        public abstract Task<IEnumerable<T>> GetAll();
-        public abstract Task<bool> CheckIfExist(int id);
-        public abstract Task<T> AddAsync(T newEntity);
-        public abstract void RemoveEntity(T entity);
-        public abstract void Update(T entity);
-        public abstract Task AddRange(IEnumerable<T> newEntities);
-        public abstract Task SaveChanges();
+        IQueryable<T> FilterBy(Expression<Func<T, bool>> filterExpression,
+            Expression<Func<T, object>>[]? propertiesToIncludes = null);
+        IEnumerable<TProjected> FilterBy<TProjected>(
+            Expression<Func<T, bool>> filterExpression,
+            Expression<Func<T, TProjected>> projectionExpression,
+            Expression<Func<T, object>>[]? propertiesToIncludes = null);
+        T FindOne(Expression<Func<T, bool>> filterExpression, Expression<Func<T, object>>[]? propertiesToIncludes = null);
+        Task<T> FindOneAsync(Expression<Func<T, bool>> filterExpression, Expression<Func<T, object>>[]? propertiesToIncludes = null);
+        IQueryable<T> AsQueryable(Expression<Func<T, object>>[]? propertiesToIncludes = null);
+        T FindById(Guid id, Expression<Func<T, object>>[]? propertiesToIncludes = null);
+        Task<T> FindByIdAsync(Guid id, Expression<Func<T, object>>[]? propertiesToIncludes = null);
+        void InsertOne(T entity);
+        Task InsertOneAsync(T entity);
+        void ReplaceOne(T document);
+        Task ReplaceOneAsync(T document);
+        void SaveChanges();
+        Task SaveChangesAsync();
     }
 }

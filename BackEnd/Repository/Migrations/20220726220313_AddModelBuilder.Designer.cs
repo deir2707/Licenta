@@ -10,8 +10,8 @@ using Repository;
 namespace Repository.Migrations
 {
     [DbContext(typeof(AuctionContext))]
-    [Migration("20220515190401_UpdateBdV1")]
-    partial class UpdateBdV1
+    [Migration("20220726220313_AddModelBuilder")]
+    partial class AddModelBuilder
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,24 +23,28 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Domain.Address", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("City")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Country")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Number")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("State")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Street")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -50,28 +54,26 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Domain.Auction", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("BuyerId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("BuyerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("MoreDetails")
+                    b.Property<string>("OtherDetails")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SellerId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("SellerId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("StartDate")
                         .HasColumnType("datetime2");
@@ -79,8 +81,12 @@ namespace Repository.Migrations
                     b.Property<int>("StartingPrice")
                         .HasColumnType("int");
 
-                    b.Property<string>("Tip")
+                    b.Property<string>("Title")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -93,66 +99,81 @@ namespace Repository.Migrations
 
             modelBuilder.Entity("Domain.Bid", b =>
                 {
-                    b.Property<int>("BidderId")
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("Amount")
                         .HasColumnType("int");
 
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AuctionId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("BidAmount")
-                        .HasColumnType("int");
+                    b.Property<Guid>("BidderId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.HasKey("BidderId", "AuctionId");
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("AuctionId");
+
+                    b.HasIndex("BidderId");
 
                     b.ToTable("Bids");
                 });
 
             modelBuilder.Entity("Domain.Image", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("AuctionId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("AuctionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<byte[]>("DataFiles")
+                        .IsRequired()
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("FileType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ImageFileName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuctionId");
 
                     b.ToTable("Images");
                 });
 
             modelBuilder.Entity("Domain.User", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("int");
+                    b.Property<Guid?>("AddressId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Balance")
                         .HasColumnType("int");
 
                     b.Property<string>("Email")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FullName")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Password")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -164,16 +185,18 @@ namespace Repository.Migrations
                     b.HasData(
                         new
                         {
-                            Id = 1,
+                            Id = new Guid("00000000-0000-0000-0000-000000000001"),
                             Balance = 0,
                             Email = "user1@email.com",
+                            FullName = "User1",
                             Password = "password"
                         },
                         new
                         {
-                            Id = 2,
+                            Id = new Guid("00000000-0000-0000-0000-000000000002"),
                             Balance = 0,
                             Email = "user2@email.com",
+                            FullName = "User2",
                             Password = "password2"
                         });
                 });
@@ -198,9 +221,9 @@ namespace Repository.Migrations
             modelBuilder.Entity("Domain.Bid", b =>
                 {
                     b.HasOne("Domain.Auction", "Auction")
-                        .WithMany()
+                        .WithMany("Bids")
                         .HasForeignKey("AuctionId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("Domain.User", "Bidder")
@@ -214,6 +237,17 @@ namespace Repository.Migrations
                     b.Navigation("Bidder");
                 });
 
+            modelBuilder.Entity("Domain.Image", b =>
+                {
+                    b.HasOne("Domain.Auction", "Auction")
+                        .WithMany("Images")
+                        .HasForeignKey("AuctionId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Auction");
+                });
+
             modelBuilder.Entity("Domain.User", b =>
                 {
                     b.HasOne("Domain.Address", "Address")
@@ -221,6 +255,13 @@ namespace Repository.Migrations
                         .HasForeignKey("AddressId");
 
                     b.Navigation("Address");
+                });
+
+            modelBuilder.Entity("Domain.Auction", b =>
+                {
+                    b.Navigation("Bids");
+
+                    b.Navigation("Images");
                 });
 
             modelBuilder.Entity("Domain.User", b =>

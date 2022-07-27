@@ -1,7 +1,9 @@
-﻿namespace Service.Outputs
+﻿using System;
+
+namespace Service.Outputs
 {
     public class AuctionFinishedNotification
     {
-        public int AuctionId { get; set; }
+        public Guid AuctionId { get; set; }
     }
 }

@@ -10,7 +10,7 @@ import { AddBalanceInput, UserDetails } from "../../interfaces/UsersInterfaces";
 import dateService from "../../services/DateService";
 
 export const MyProfileDetails = () => {
-  const id = Number(localStorage.getItem("userId"));
+  const id = localStorage.getItem("userId");
 
   const { handleApiError } = useApiError();
   const [userDetails, setUserDetails] = useState<UserDetails>();
@@ -54,7 +54,6 @@ export const MyProfileDetails = () => {
       {!userDetails && <div> loading</div>}
       {userDetails && (
         <div>
-          <div>Id: {userDetails?.id}</div>
           <div>Email: {userDetails?.email}</div>
           <div>Full Name: {userDetails?.fullName}</div>
           <div>Balance: {userDetails?.balance}</div>

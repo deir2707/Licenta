@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Service.Inputs;
 using Service.Outputs;
 
@@ -7,10 +8,10 @@ namespace Service
     public interface IUserService
     {
         
-        public Task<int> Register(RegisterInput registerInput);
-        public Task<UserDetails> GetUserDetails(int id);
+        public Task<UserDetails> Register(RegisterInput registerInput);
+        public Task<UserDetails> GetUserDetails(Guid id);
 
         public Task<UserDetails> Login(LoginInput loginInput);
-        public Task<int> AddBalance(AddBalanceInput addBalanceInput);
+        public Task<Guid> AddBalance(AddBalanceInput addBalanceInput);
     }
 }

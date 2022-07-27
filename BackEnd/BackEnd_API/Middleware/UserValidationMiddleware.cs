@@ -1,6 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
+using Domain;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Repository;
 
 namespace BackEnd.Middleware
@@ -14,12 +15,18 @@ namespace BackEnd.Middleware
             _next = next;
         }
 
-        public async Task Invoke(HttpContext context, AuctionContext auctionContext)
+        public async Task Invoke(HttpContext context, IRepository<User> userRepository)
         {
+            var pathValue = context.Request.Path.Value;
+            if (pathValue == null)
+            {
+                context.Response.StatusCode = 401;
+                return;
+            }
             if (context.Request.Method == "OPTIONS" ||
-                context.Request.Path.Value.Contains("register") ||
-                context.Request.Path.Value.Contains("login") ||
-                context.Request.Path.Value.Contains("hub"))
+                pathValue.Contains("register") ||
+                pathValue.Contains("login") ||
+                pathValue.Contains("hub"))
             {
                 await _next(context);
                 return;
@@ -31,13 +38,13 @@ namespace BackEnd.Middleware
                 return;
             }
 
-            if (!int.TryParse(token, out var userId))
+            if (!Guid.TryParse(token, out var userId))
             {
                 context.Response.StatusCode = 401;
                 return;
             }
 
-            var user = await auctionContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+            var user = await userRepository.FindByIdAsync(userId);
 
             if (user == null)
             {

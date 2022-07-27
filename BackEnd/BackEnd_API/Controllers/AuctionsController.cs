@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 using Service.Inputs;
@@ -44,8 +45,8 @@ namespace BackEnd.Controllers
                 return Ok(response);
             }
             
-            [HttpGet("{id:int}")]
-            public async Task<IActionResult> GetAllAuctions(int id)
+            [HttpGet("{id}")]
+            public async Task<IActionResult> GetAllAuctions(Guid id)
             {
                 var response = await _auctionService.GetAuctionDetails(id);
                 return Ok(response);

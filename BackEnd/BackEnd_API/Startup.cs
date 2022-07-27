@@ -1,7 +1,6 @@
 using BackEnd.Hubs;
 using BackEnd.Middleware;
 using Domain;
-using Infrastructure;
 using Infrastructure.Mongo;
 using Infrastructure.Notifications;
 using Microsoft.AspNetCore.Builder;
@@ -31,11 +30,30 @@ namespace BackEnd
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDbSettings"));
+            var shouldUseMongoDb = Configuration.GetValue<bool>("UseMongoDb");
+            if (shouldUseMongoDb)
+            {
+                services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDbSettings"));
 
-            services.AddSingleton<IMongoDbSettings>(serviceProvider =>
-                serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
+                services.AddSingleton<IMongoDbSettings>(serviceProvider =>
+                    serviceProvider.GetRequiredService<IOptions<MongoDbSettings>>().Value);
 
+                services.AddTransient<IRepository<User>, MongoRepository<User>>();
+                services.AddTransient<IRepository<Auction>, MongoRepository<Auction>>();
+                services.AddTransient<IRepository<Bid>, MongoRepository<Bid>>();
+                services.AddTransient<IRepository<Image>, MongoRepository<Image>>();
+            }
+            else
+            {
+                services.AddDbContext<AuctionContext>(options =>
+                    options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
+                services.AddTransient<IRepository<User>, EntityFrameworkRepository<User>>();
+                services.AddTransient<IRepository<Auction>, EntityFrameworkRepository<Auction>>();
+                services.AddTransient<IRepository<Bid>, EntityFrameworkRepository<Bid>>();
+                services.AddTransient<IRepository<Image>, EntityFrameworkRepository<Image>>();
+            }
+            
             services.AddControllers();
             services.AddSignalR();
             
@@ -45,13 +63,10 @@ namespace BackEnd
                 c.OperationFilter<CustomHeaderSwaggerAttribute>();
             });
             
-            services.AddDbContext<AuctionContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IAuctionService, AuctionService>();
-            services.AddTransient<IRepository<User>,Repository<User>>();
-            services.AddTransient<IRepository<Auction>,Repository<Auction>>();
+            // services.AddTransient<IEntityFrameworkRepository<User>, EntityFrameworkRepository2<User>>();
+            // services.AddTransient<IEntityFrameworkRepository<Auction>, EntityFrameworkRepository2<Auction>>();
 
             services.AddSingleton<INotificationPublisher, AuctionHub>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

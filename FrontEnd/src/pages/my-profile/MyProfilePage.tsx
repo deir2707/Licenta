@@ -7,7 +7,7 @@ import { MyAuctions, MyProfileDetails, WonAuctions } from "./Components";
 import "./MyProfilePage.scss";
 
 export const MyProfilePage = () => {
-  const id = Number(localStorage.getItem("userId"));
+  const id = localStorage.getItem("userId");
 
   const navigate = useNavigate();
   const [selectedSubMenu, setSelectedSubMenu] = useState("details");

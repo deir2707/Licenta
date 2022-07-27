@@ -1,7 +1,7 @@
 import { PageLayout } from "../components/PageLayout";
 
 export interface Notification {
-  id: number;
+  id: string;
   event: string;
   message: string;
   data: any;

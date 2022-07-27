@@ -1,8 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Service;
 using Service.Inputs;
-using Service.Outputs;
 
 namespace BackEnd.Controllers
 {
@@ -31,8 +31,8 @@ namespace BackEnd.Controllers
             return Ok(addedId);
         }
 
-        [HttpGet("{id:int}")]
-        public async Task<IActionResult> GetUser(int id)
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetUser(Guid id)
         {
             var userDto = await _userService.GetUserDetails(id);
             return Ok(userDto);

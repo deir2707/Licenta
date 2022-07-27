@@ -33,6 +33,8 @@ namespace BackEnd.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception ex, HttpStatusCode statusCode)
         {
+            Console.WriteLine(ex.Message);
+            Console.WriteLine(ex.StackTrace);
             context.Response.Clear();
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)statusCode;

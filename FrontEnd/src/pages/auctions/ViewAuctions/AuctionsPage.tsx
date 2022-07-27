@@ -30,12 +30,16 @@ export const AuctionsPage = () => {
       )
         .then(({ data }) => {
           resetToFirstPage && setCurrentPage(1);
-
           const items = data.items.map((item) => ({
             ...item,
-            endDate: dateService.convertUTCDateToLocalDate(
-              new Date(item.endDate)
-            ),
+            startDate:
+              // dateService.convertUTCDateToLocalDate(
+              new Date(item.startDate),
+            // )
+            endDate:
+              // dateService.convertUTCDateToLocalDate(
+              new Date(item.endDate),
+            // ),
           }));
 
           setAuctions(items);
@@ -54,6 +58,7 @@ export const AuctionsPage = () => {
     },
     []
   );
+
   const handleAuctionFinished = useCallback(
     (notification: AuctionNotification) => {
       const auctionFinished = notification.data as AuctionFinishedNotification;
@@ -85,14 +90,6 @@ export const AuctionsPage = () => {
   );
 
   useEffect(() => {
-    const load = async () => {
-      await loadAuctions();
-    };
-    load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  useEffect(() => {
     loadAuctions(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPage]);
@@ -101,22 +98,15 @@ export const AuctionsPage = () => {
     PubSub.subscribe(PubSubEvents.AuctionBid, async () => {
       await loadAuctions();
     });
-
-    return () => {
-      PubSub.unsubscribe(PubSubEvents.AuctionBid);
-    };
-  }, [loadAuctions]);
-
-  useEffect(() => {
     PubSub.subscribe(PubSubEvents.AuctionFinished, async (event, data) => {
       handleAuctionFinished(data as unknown as AuctionNotification);
     });
 
     return () => {
+      PubSub.unsubscribe(PubSubEvents.AuctionBid);
       PubSub.unsubscribe(PubSubEvents.AuctionFinished);
     };
-  }, [handleAuctionFinished]);
-
+  }, [handleAuctionFinished, loadAuctions]);
   return (
     <PageLayout>
       <div id="view-auctions">

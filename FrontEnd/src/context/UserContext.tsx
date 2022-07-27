@@ -5,22 +5,22 @@ export interface ProviderProps {
 }
 
 interface UserContextModel {
-  userId: number;
+  userId: string;
   fullName: string;
   email: string;
   balance: number;
-  setUserId: (value: number) => void;
+  setUserId: (value: string) => void;
   setFullName: (value: string) => void;
   setEmail: (value: string) => void;
   setBalance: (value: number) => void;
 }
 
 export const UserContext = createContext<UserContextModel>({
-  userId: 0,
+  userId: "",
   fullName: "",
   email: "",
   balance: 0,
-  setUserId: null as unknown as (value: number) => void,
+  setUserId: null as unknown as (value: string) => void,
   setFullName: null as unknown as (value: string) => void,
   setEmail: null as unknown as (value: string) => void,
   setBalance: null as unknown as (value: number) => void,
@@ -28,7 +28,7 @@ export const UserContext = createContext<UserContextModel>({
 
 export const UserContextProvider = ({ children }: ProviderProps) => {
   const [userId, setUserId] = useState(
-    localStorage.getItem("user") as unknown as number
+    localStorage.getItem("user") as unknown as string
   );
   const [fullName, setFullName] = useState(
     localStorage.getItem("fullName") as string

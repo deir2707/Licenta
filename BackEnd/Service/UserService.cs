@@ -1,9 +1,8 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Domain;
-using Infrastructure;
 using Infrastructure.Models;
-using Microsoft.EntityFrameworkCore;
 using Repository;
 using Service.Extensions;
 using Service.Inputs;
@@ -13,19 +12,19 @@ namespace Service
 {
     public class UserService : IUserService
     {
-        private readonly AuctionContext _auctionContext;
         private readonly ICurrentUserProvider _currentUserProvider;
+        private readonly IRepository<User> _userRepository;
 
-        public UserService(AuctionContext auctionContext,
-            ICurrentUserProvider currentUserProvider)
+        public UserService(ICurrentUserProvider currentUserProvider,
+            IRepository<User> userRepository)
         {
-            _auctionContext = auctionContext;
             _currentUserProvider = currentUserProvider;
+            _userRepository = userRepository;
         }
 
-        public async Task<int> Register(RegisterInput registerInput)
+        public async Task<UserDetails> Register(RegisterInput registerInput)
         {
-            var user = await FetchUserByEmail(registerInput.Email);
+            var user = FetchUserByEmail(registerInput.Email);
 
             if (user is not null)
                 throw new AuctionException(ErrorCode.UserAlreadyExists, "User already exists");
@@ -33,53 +32,57 @@ namespace Service
             var newUser = new User
             {
                 Email = registerInput.Email,
-                Password = registerInput.Password
+                Password = registerInput.Password,
+                FullName = registerInput.FullName,
             };
+            
+            _currentUserProvider.SetUser(newUser);
 
-            await _auctionContext.AddAsync(newUser);
-            await _auctionContext.SaveChangesAsync();
+            await _userRepository.InsertOneAsync(newUser);
 
-            return newUser.Id;
+            return newUser.ToUserDetails();
         }
 
-        public async Task<UserDetails> GetUserDetails(int id)
+        public async Task<UserDetails> GetUserDetails(Guid id)
         {
-            var user = await _auctionContext.Users.FirstOrDefaultAsync(x => x.Id == id);
+            var user = await _userRepository.FindByIdAsync(id);
+            
+            if (user is null)
+                throw new AuctionException(ErrorCode.UserNotFound, "User not found");
+            
             return user.ToUserDetails();
         }
 
-        private async Task<User> FetchUserByEmail(string email)
+        private User? FetchUserByEmail(string email)
         {
-            return await _auctionContext.Users
-                .FirstOrDefaultAsync(u => u.Email.Equals(email));
+            return _userRepository.AsQueryable().FirstOrDefault(u => u.Email.Equals(email));
         }
 
-        public async Task<UserDetails> Login(LoginInput loginInput)
+        public Task<UserDetails> Login(LoginInput loginInput)
         {
-            var user = await FetchUserByEmail(loginInput.Email);
+            var user = FetchUserByEmail(loginInput.Email);
 
-            ValidateUser(user);
-
+            if (user is null)
+                throw new AuctionException(ErrorCode.UserNotFound, "Invalid credentials");
+            
             if (!user.Password.Equals(loginInput.Password))
                 throw new AuctionException(ErrorCode.UserNotFound, "Invalid credentials");
 
-            return user.ToUserDetails();
+            return Task.FromResult(user.ToUserDetails());
         }
 
-        public async Task<int> AddBalance(AddBalanceInput addBalanceInput)
+        public async Task<Guid> AddBalance(AddBalanceInput addBalanceInput)
         {
-            var user = await _auctionContext.Users.FirstAsync(x => x.Id == _currentUserProvider.UserId);
-            user.Balance += addBalanceInput.BalanceToAdd;
-            await _auctionContext.SaveChangesAsync();
-            return user.Id;
-        }
-
-        private void ValidateUser(User user)
-        {
+            var user = await _userRepository.FindByIdAsync(_currentUserProvider.UserId);
+            
             if (user is null)
             {
-                throw new AuctionException(ErrorCode.UserNotFound, "Invalid credentials");
+                throw new AuctionException(ErrorCode.UserNotFound, "User not found");
             }
+            
+            user.Balance += addBalanceInput.BalanceToAdd;
+            await _userRepository.ReplaceOneAsync(user);
+            return user.Id;
         }
     }
 }

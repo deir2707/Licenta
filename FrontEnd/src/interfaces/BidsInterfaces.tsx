@@ -1,12 +1,12 @@
 export interface BidDetails {
-  id: number;
+  id: string;
   amount: number;
   date: Date;
   bidderName: string;
 }
 
 export interface BidInput {
-  auctionId: number;
+  auctionId: string;
   bidAmount: number;
   date: Date;
 }

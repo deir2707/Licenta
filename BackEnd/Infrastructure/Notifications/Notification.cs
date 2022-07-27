@@ -1,8 +1,10 @@
-﻿namespace Infrastructure.Notifications
+﻿using System;
+
+namespace Infrastructure.Notifications
 {
     public class Notification
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
 
         public string Event { get; set; }
 

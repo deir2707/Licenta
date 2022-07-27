@@ -7,7 +7,7 @@ export enum AuctionType {
 }
 
 export interface AuctionOutput {
-  id: number;
+  id: string;
   title: string;
   description: string;
   startingPrice: number;
@@ -21,7 +21,7 @@ export interface AuctionOutput {
 }
 
 export interface AuctionDetails {
-  id: number;
+  id: string;
   title: string;
   description: string;
   startingPrice: number;
@@ -34,7 +34,7 @@ export interface AuctionDetails {
   noOfBids: number;
   bids: BidDetails[];
   isFinished: boolean;
-  sellerId: number;
+  sellerId: string;
 }
 
 export interface AddAuctionInput {

@@ -2,13 +2,12 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Domain;
-using Infrastructure;
 using Infrastructure.Models;
 using Infrastructure.Notifications;
 using Microsoft.AspNetCore.Http;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Repository;
 using Service.Extensions;
@@ -19,22 +18,25 @@ namespace Service
 {
     public class AuctionService : IAuctionService
     {
-        private readonly AuctionContext _auctionContext;
         private readonly INotificationPublisher _notificationPublisher;
         private readonly ICurrentUserProvider _currentUserProvider;
+        private readonly IRepository<Auction> _auctionRepository;
+        private readonly IRepository<User> _userRepository;
+        private readonly IRepository<Bid> _bidsRepository;
 
-        public AuctionService(AuctionContext auctionContext, INotificationPublisher notificationPublisher,
-            ICurrentUserProvider currentUserProvider)
+        public AuctionService(INotificationPublisher notificationPublisher,
+            ICurrentUserProvider currentUserProvider, IRepository<Auction> auctionRepository,
+            IRepository<User> userRepository, IRepository<Bid> bidsRepository)
         {
-            _auctionContext = auctionContext;
             _notificationPublisher = notificationPublisher;
             _currentUserProvider = currentUserProvider;
+            _auctionRepository = auctionRepository;
+            _userRepository = userRepository;
+            _bidsRepository = bidsRepository;
         }
 
-        public async Task<int> CreateAuction(AuctionInput auctionInput)
+        public async Task<Guid> CreateAuction(AuctionInput auctionInput)
         {
-            var images = ExtractImages(auctionInput.Images);
-
             var otherDetails = ParseOtherDetails(auctionInput);
 
             var auction = new Auction
@@ -44,78 +46,90 @@ namespace Service
                 Description = auctionInput.Description,
                 StartDate = DateTime.UtcNow,
                 EndDate = DateTime.UtcNow.AddDays(7),
-                Type = AuctionType.Car,
+                Type = auctionInput.Type,
                 OtherDetails = otherDetails,
                 SellerId = _currentUserProvider.UserId,
-                Images = images
+                Seller = _currentUserProvider.User
             };
 
-            await _auctionContext.Auctions.AddAsync(auction);
-            await _auctionContext.SaveChangesAsync();
+            auction.Images = ExtractImages(auctionInput.Images, auction.Id);
+
+            await _auctionRepository.InsertOneAsync(auction);
 
             return auction.Id;
         }
 
-        private Dictionary<string,string> ParseOtherDetails(AuctionInput auctionInput)
+        private Dictionary<string, string> ParseOtherDetails(AuctionInput auctionInput)
         {
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(auctionInput.OtherDetails);
         }
 
-        public async Task<AuctionDetails> GetAuctionDetails(int id)
+        public async Task<AuctionDetails> GetAuctionDetails(Guid id)
         {
-            var auction = await _auctionContext.Auctions
-                .Include(a => a.Images)
-                .Include(a => a.Bids).ThenInclude(b=>b.Bidder)
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var auction = await _auctionRepository.FindOneAsync(a => a.Id == id, new Expression<Func<Auction, object>>[]
+            {
+                a => a.Images,
+                a => a.Bids.Select(b => b.Bidder),
+            });
+
             return auction.ToAuctionDetails();
         }
 
-        public async Task<PaginationOutput<AuctionOutput>> GetAllAuctionDetails(int page, int pageSize)
+        public Task<PaginationOutput<AuctionOutput>> GetAllAuctionDetails(int page, int pageSize)
         {
-            var query = _auctionContext.Auctions
-                .Where(a => a.SellerId != _currentUserProvider.UserId)
-                .Where(a => a.EndDate > DateTime.UtcNow)
-                .OrderBy(a => a.EndDate)
-                .Include(a => a.Images)
-                .Include(a => a.Bids);
+            var query = _auctionRepository
+                .FilterBy(a => a.SellerId != _currentUserProvider.UserId && a.EndDate > DateTime.UtcNow,
+                    new Expression<Func<Auction, object>>[]
+                    {
+                        a => a.Images,
+                        a => a.Bids
+                    })
+                .OrderBy(a => a.EndDate);
 
-            var totalCount = await query.CountAsync();
+            var totalCount = query.Count();
 
-            var auctions = await query.Page(page, pageSize).ToListAsync();
+            var auctions = query.AsQueryable().Page(page, pageSize).ToList();
 
             var auctionDetails = auctions.Select(a => a.ToAuctionOutput()).ToList();
 
-            return new PaginationOutput<AuctionOutput>
+            return Task.FromResult(new PaginationOutput<AuctionOutput>
             {
                 Items = auctionDetails,
                 TotalItems = totalCount,
                 Page = page,
                 PageSize = pageSize
-            };
+            });
         }
 
-        public async Task<int> MakeBid(BidInput bidInput)
+        public async Task<Guid> MakeBid(BidInput bidInput)
         {
-            var auction = await GetAuction(bidInput.AuctionId);
+            var auction = await _auctionRepository.FindByIdAsync(bidInput.AuctionId, new Expression<Func<Auction, object>>[]
+            {
+                a => a.Bids
+            });
 
-            ValidateAuction(auction);
+            var user = await _userRepository.FindByIdAsync(_currentUserProvider.UserId);
+            
+            ValidateAuction(auction, user);
 
             var highestBid = auction.Bids.Where(b => b.AuctionId == bidInput.AuctionId)
                 .OrderByDescending(b => b.Amount).FirstOrDefault();
 
-            ValidateBid(bidInput, highestBid, auction);
+            ValidateBid(bidInput, highestBid, auction, user);
 
             var bid = new Bid
             {
                 AuctionId = bidInput.AuctionId,
                 Amount = bidInput.BidAmount,
-                BidderId = _currentUserProvider.UserId,
+                BidderId = user.Id,
+                Bidder = user
             };
 
-            _currentUserProvider.User.Balance -= bidInput.BidAmount;
-
-            await _auctionContext.Bids.AddAsync(bid);
-            await _auctionContext.SaveChangesAsync();
+            auction.Bids.Add(bid);
+            await _bidsRepository.InsertOneAsync(bid);
+            
+            user.Balance -= bidInput.BidAmount;
+            await _userRepository.ReplaceOneAsync(user);
 
             await _notificationPublisher.PublishMessageToUser(new Notification
             {
@@ -130,44 +144,55 @@ namespace Service
             return bid.Id;
         }
 
-        public async Task<List<AuctionOutput>> GetMyAuctions()
+        public Task<List<AuctionOutput>> GetMyAuctions()
         {
-            return await _auctionContext.Auctions
-                .Where(a=>a.SellerId == _currentUserProvider.UserId)
-                .OrderByDescending(a => a.EndDate)
-                .Include(a => a.Images)
-                .Include(a => a.Bids)
-                .Select(a => a.ToAuctionOutput())
-                .ToListAsync();
+            return Task.FromResult(_auctionRepository
+                .FilterBy(a => a.SellerId == _currentUserProvider.UserId,
+                    a => a.ToAuctionOutput(),
+                    new Expression<Func<Auction, object>>[]
+                    {
+                        a => a.Images,
+                        a => a.Bids
+                    })
+                .OrderBy(a => a.EndDate)
+                .ToList());
         }
 
-        public async Task<List<AuctionOutput>> GetWonAuctions()
+        public Task<List<AuctionOutput>> GetWonAuctions()
         {
-            return await _auctionContext.Auctions
-                .Where(a=>a.BuyerId == _currentUserProvider.UserId)
-                .OrderByDescending(a => a.EndDate)
-                .Include(a => a.Images)
-                .Include(a => a.Bids)
-                .Select(a => a.ToAuctionOutput())
-                .ToListAsync();
+            return Task.FromResult(_auctionRepository
+                .FilterBy(a => a.BuyerId == _currentUserProvider.UserId,
+                    a => a.ToAuctionOutput(),
+                    new Expression<Func<Auction, object>>[]
+                    {
+                        a => a.Images,
+                        a => a.Bids
+                    })
+                .OrderBy(a => a.EndDate)
+                .ToList());
         }
-        
-        private void ValidateAuction(Auction auction)
+
+        private void ValidateAuction(Auction auction, User user)
         {
+            if (auction == null)
+            {
+                throw new AuctionException(ErrorCode.AuctionNotFound, "Auction not found");
+            }
+            
             if (auction.EndDate < DateTime.UtcNow)
             {
                 throw new AuctionException(ErrorCode.AuctionEnded, "Auction has ended");
             }
 
-            if (auction.SellerId == _currentUserProvider.UserId)
+            if (auction.SellerId == user.Id)
             {
                 throw new AuctionException(ErrorCode.BidOnOwnAuction, "You cannot bid on your own auction");
             }
         }
 
-        private void ValidateBid(BidInput bidInput, Bid highestBid, Auction auction)
+        private void ValidateBid(BidInput bidInput, Bid highestBid, Auction auction, User user)
         {
-            if (_currentUserProvider.User.Balance < bidInput.BidAmount)
+            if (user.Balance < bidInput.BidAmount)
             {
                 throw new AuctionException(ErrorCode.InsufficientBalance, "Insufficient balance");
             }
@@ -190,21 +215,7 @@ namespace Service
             }
         }
 
-        private static Dictionary<string, string> ExtractOtherDetails(CarInput carInput)
-        {
-            return new Dictionary<string, string>
-            {
-                {"make", carInput.Make},
-                {"model", carInput.Model},
-                {"transmission", carInput.Transmission},
-                {"year", carInput.Year.ToString()},
-                {"engineCapacity", carInput.EngineCapacity.ToString()},
-                {"fuelType", carInput.FuelType},
-                {"mileage", carInput.Mileage.ToString()}
-            };
-        }
-
-        private static List<Image> ExtractImages(List<IFormFile> images)
+        private static List<Image> ExtractImages(List<IFormFile> images, Guid auctionId)
         {
             return images.Select(img =>
             {
@@ -216,6 +227,7 @@ namespace Service
                 {
                     ImageFileName = filePath,
                     FileType = fileExtension,
+                    AuctionId = auctionId,
                 };
 
                 using var target = new MemoryStream();
@@ -226,11 +238,12 @@ namespace Service
             }).ToList();
         }
 
-        private async Task<Auction> GetAuction(int id)
+        private async Task<Auction> GetAuction(Guid id)
         {
-            var auction = await _auctionContext.Auctions
-                .Include(a => a.Bids)
-                .FirstOrDefaultAsync(a => a.Id == id);
+            var auction = await _auctionRepository.FindByIdAsync(id, new Expression<Func<Auction, object>>[]
+            {
+                a => a.Bids
+            });
 
             if (auction == null)
             {
@@ -238,22 +251,6 @@ namespace Service
             }
 
             return auction;
-        }
-
-        private async Task<List<Auction>> GetAllAuctions(int? size = null, int? page = null)
-        {
-            var query = _auctionContext.Auctions
-                .Where(a => a.EndDate > DateTime.UtcNow)
-                .OrderBy(a => a.EndDate)
-                .Include(a => a.Images)
-                .Include(a => a.Bids);
-
-            if (!size.HasValue || !page.HasValue)
-            {
-                return await query.ToListAsync();
-            }
-
-            return await query.Skip((page.Value - 1) * size.Value).Take(size.Value).ToListAsync();
         }
     }
 }

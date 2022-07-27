@@ -1,8 +1,10 @@
-﻿namespace Service.Outputs
+﻿using System;
+
+namespace Service.Outputs
 {
     public class BidNotification
     {
-        public int AuctionId { get; set; }
+        public Guid AuctionId { get; set; }
         public int BidAmount { get; set; }
     }
 }

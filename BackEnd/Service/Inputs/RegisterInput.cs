@@ -1,16 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Service.Inputs
+﻿namespace Service.Inputs
 {
     public class RegisterInput
     {
-        [Required]
-        [EmailAddress]
+        // [Required]
+        // [EmailAddress]
         public string Email { get; set; }
-        [Required]
+        // [Required]
         public string FullName { get; set; }
-        [Required] 
-        [MinLength(8)]
+        // [Required] 
+        // [MinLength(8)]
         public string Password { get; set; }
     }
 }

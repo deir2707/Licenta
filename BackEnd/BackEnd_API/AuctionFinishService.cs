@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Domain;
 using Infrastructure.Notifications;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Repository;
@@ -34,6 +34,10 @@ namespace BackEnd
                 _timer = new Timer(OnTimer, firstAuctionToEnd, firstAuctionToEnd.EndDate - DateTime.UtcNow,
                     Timeout.InfiniteTimeSpan);
             }
+            else
+            {
+                _timer = new Timer(OnTimer, firstAuctionToEnd, TimeSpan.FromHours(1), Timeout.InfiniteTimeSpan);
+            }
 
             return Task.CompletedTask;
         }
@@ -42,29 +46,35 @@ namespace BackEnd
         {
             using var scope = _scopeFactory.CreateScope();
 
-            var context =  scope.ServiceProvider.GetRequiredService<AuctionContext>();
-            
-            return context.Auctions.Where(a => a.EndDate > DateTime.UtcNow)
+            var auctionRepository =  scope.ServiceProvider.GetRequiredService<IRepository<Auction>>();
+
+            return auctionRepository.AsQueryable().Where(a => a.EndDate > DateTime.UtcNow)
                 .OrderBy(a => a.EndDate).FirstOrDefault();
         }
 
-        private void FinishAuction(int auctionId)
+        private void FinishAuction(Guid auctionId)
         {
             using var scope = _scopeFactory.CreateScope();
 
-            var context =  scope.ServiceProvider.GetRequiredService<AuctionContext>();
-            
-            var auction = context.Auctions
-                .Include(a => a.Bids).ThenInclude(b => b.Bidder)
-                .FirstOrDefault(a => a.Id == auctionId);
+            var auctionRepository =  scope.ServiceProvider.GetRequiredService<IRepository<Auction>>();
 
-            var highestBid = auction?.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
+            var auction = auctionRepository.FindById(auctionId, new Expression<Func<Auction, object>>[]
+            {
+                a => a.Bids.Select(b => b.Bidder)
+            });
+            
+            if (auction == null)
+            {
+                return;
+            }
+            
+            var highestBid = auction.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
 
             if (highestBid == null) return;
             
-            if (auction != null) auction.Buyer = highestBid.Bidder;
-            
-            context.SaveChanges();
+            auction.Buyer = highestBid.Bidder;
+            auction.BuyerId = highestBid.BidderId;
+            auctionRepository.ReplaceOne(auction);
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
@@ -80,19 +90,22 @@ namespace BackEnd
 
         private void OnTimer(object state)
         {
-            var auction = (Auction) state;
-
-            _notificationPublisher.PublishMessageToUser(new Notification
+            if (state != null)
             {
-                Event = NotificationEvents.AuctionFinished,
-                Data = new AuctionFinishedNotification
+                var auction = (Auction) state;
+
+                _notificationPublisher.PublishMessageToUser(new Notification
                 {
-                    AuctionId = auction.Id
-                },
-            });
+                    Event = NotificationEvents.AuctionFinished,
+                    Data = new AuctionFinishedNotification
+                    {
+                        AuctionId = auction.Id
+                    },
+                });
 
-            FinishAuction(auction.Id);
-
+                FinishAuction(auction.Id);
+            }
+            
             var nextAuctionToEnd = GetFirstAuctionToEnd();
 
             _timer = null;
@@ -101,8 +114,6 @@ namespace BackEnd
             {
                 _timer = new Timer(OnTimer, nextAuctionToEnd, TimeSpan.FromHours(1), Timeout.InfiniteTimeSpan);
             }
-
-            ;
 
             _timer = new Timer(OnTimer, nextAuctionToEnd, nextAuctionToEnd.EndDate - DateTime.UtcNow,
                 Timeout.InfiniteTimeSpan);

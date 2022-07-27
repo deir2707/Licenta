@@ -1,7 +1,13 @@
-﻿namespace Domain
+﻿using System;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
+namespace Domain
 {
     public interface IEntity
     {
-        public int Id { get; set; }
+        [BsonId]
+        [BsonRepresentation(BsonType.String)]
+        public Guid Id { get; set; }
     }
 }

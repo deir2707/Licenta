@@ -1,3 +1,3 @@
 export interface AuctionFinishedNotification {
-  auctionId: number;
+  auctionId: string;
 }

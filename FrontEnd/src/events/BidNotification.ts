@@ -1,4 +1,4 @@
 export interface BidNotification {
-  auctionId: number;
+  auctionId: string;
   bidAmount: number;
 }

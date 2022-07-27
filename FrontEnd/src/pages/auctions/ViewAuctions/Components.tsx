@@ -7,7 +7,7 @@ import { Image } from "../../../components/Image";
 import dateService from "../../../services/DateService";
 
 export interface AuctionItemProps {
-  id: number;
+  id: string;
   title: string;
   price: number;
   description: string;

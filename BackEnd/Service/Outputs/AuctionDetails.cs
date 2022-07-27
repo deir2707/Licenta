@@ -6,7 +6,7 @@ namespace Service.Outputs
 {
     public class AuctionDetails
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public int StartingPrice { get; set; }
@@ -19,6 +19,6 @@ namespace Service.Outputs
         public int NoOfBids { get; set; }
         public List<BidDetails> Bids { get; set; }
         public bool IsFinished { get; set; }
-        public int SellerId { get; set; }
+        public Guid SellerId { get; set; }
     }
 }

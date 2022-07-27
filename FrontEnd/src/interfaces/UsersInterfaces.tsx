@@ -1,5 +1,5 @@
 export interface UserDetails {
-  id: number;
+  id: string;
   fullName: string;
   email: string;
   balance: number;

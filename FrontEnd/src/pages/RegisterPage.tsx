@@ -31,7 +31,7 @@ export const RegisterPage = () => {
       registerModel
     )
       .then(({ data }) => {
-        localStorage.setItem("userId", data.id.toString());
+        localStorage.setItem("userId", data.id);
         localStorage.setItem("fullName", data.fullName);
         localStorage.setItem("email", data.email);
         localStorage.setItem("balance", data.balance.toString());
