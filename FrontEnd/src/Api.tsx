@@ -13,7 +13,6 @@ const axiosConfig = {
       "Content-Type": "application/json",
       Accept: "application/json",
     },
-    // "User-Id": localStorage.getItem("userId") || "-1",
   },
   paramsSerializer: (params: PathLike) =>
     qs.stringify(params, { indices: false }),

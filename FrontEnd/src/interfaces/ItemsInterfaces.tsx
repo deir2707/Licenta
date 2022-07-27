@@ -1,5 +1,4 @@
 export interface CarInput {
-  // Title: string;
   Make: string;
   Model: string;
   Year: string;
@@ -7,10 +6,6 @@ export interface CarInput {
   EngineCapacity: string;
   Mileage: string;
   FuelType: string;
-  // Description: string;
-  // StartPrice: string;
-  // CarImageInput?: CarImageInput;
-  // type: string;
 }
 export interface CarImageInput {
   files: any[];
