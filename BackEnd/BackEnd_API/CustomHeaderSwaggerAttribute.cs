@@ -17,7 +17,7 @@ namespace BackEnd
                 Required = true,
                 Schema = new OpenApiSchema
                 {
-                    Type = "integer",
+                    Type = "string",
                 }
             });
         }

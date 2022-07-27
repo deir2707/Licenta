@@ -85,7 +85,8 @@ namespace BackEnd
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "BackEnd_API v1"));
             }
-            
+
+            // app.UseMiddleware<TimerMiddleware>();
             app.UseMiddleware<CustomExceptionMiddleware>();
             app.UseMiddleware<UserValidationMiddleware>();
             
