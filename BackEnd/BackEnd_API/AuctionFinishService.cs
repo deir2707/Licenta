@@ -57,6 +57,8 @@ namespace BackEnd
             using var scope = _scopeFactory.CreateScope();
 
             var auctionRepository =  scope.ServiceProvider.GetRequiredService<IRepository<Auction>>();
+            var userRepository =  scope.ServiceProvider.GetRequiredService<IRepository<User>>();
+            var bidsRepository =  scope.ServiceProvider.GetRequiredService<IRepository<Bid>>();
 
             var auction = auctionRepository.FindById(auctionId, new Expression<Func<Auction, object>>[]
             {
@@ -68,11 +70,12 @@ namespace BackEnd
                 return;
             }
             
+            IncludeBids(auction, userRepository, bidsRepository);
+            
             var highestBid = auction.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
 
             if (highestBid == null) return;
             
-            auction.Buyer = highestBid.Bidder;
             auction.BuyerId = highestBid.BidderId;
             auctionRepository.ReplaceOne(auction);
         }
@@ -113,10 +116,26 @@ namespace BackEnd
             if (nextAuctionToEnd == null)
             {
                 _timer = new Timer(OnTimer, nextAuctionToEnd, TimeSpan.FromHours(1), Timeout.InfiniteTimeSpan);
+                return;
             }
 
             _timer = new Timer(OnTimer, nextAuctionToEnd, nextAuctionToEnd.EndDate - DateTime.UtcNow,
                 Timeout.InfiniteTimeSpan);
         }
+        
+        private void IncludeBids(Auction auction, IRepository<User> userRepository, IRepository<Bid> bidsRepository)
+        {
+            if (auction.Bids != null) return;
+            
+            var bids = bidsRepository.FilterBy(b => b.AuctionId == auction.Id).ToList();
+
+            foreach (var bid in bids)
+            {
+                bid.Bidder = userRepository.FindOne(b => b.Id == bid.BidderId);
+            }
+
+            auction.Bids = bids;
+        }
+
     }
 }

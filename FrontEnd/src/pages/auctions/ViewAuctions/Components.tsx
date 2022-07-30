@@ -43,8 +43,8 @@ export const AuctionItem = (props: AuctionItemProps) => {
   }, [id, navigate]);
 
   const isFinishedClass = useMemo(() => {
-    return isFinished ? " finished" : "";
-  }, [isFinished]);
+    return isFinished || timeLeft.seconds <= 0 ? " finished" : "";
+  }, [isFinished, timeLeft]);
 
   return (
     <div className={`auction-item${isFinishedClass}`} onClick={handleOnClick}>
@@ -70,7 +70,7 @@ export const AuctionItem = (props: AuctionItemProps) => {
       </div>
       <Divider orientation="vertical" flexItem />
       <div className="expiration">
-        {!isFinished ? (
+        {!(isFinished || timeLeft.seconds <= 0) ? (
           <>
             <strong>Ends in:</strong>
             {dateService.durationToString(timeLeft)}

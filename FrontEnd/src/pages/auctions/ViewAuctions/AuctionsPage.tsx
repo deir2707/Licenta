@@ -10,7 +10,6 @@ import { ItemPagination } from "../../../interfaces/Pagination";
 import "./AuctionsPage.scss";
 import { useApiError } from "../../../hooks/useApiError";
 import { PubSubEvents } from "../../../services/notifications/PubSubEvents";
-import dateService from "../../../services/DateService";
 import { AuctionFinishedNotification } from "../../../events/AuctionFinishedNotification";
 import { AuctionNotification } from "../../../events/AuctionNotification";
 import { AuctionsList } from "../../../components/auctions-list/AuctionsList";
@@ -32,14 +31,8 @@ export const AuctionsPage = () => {
           resetToFirstPage && setCurrentPage(1);
           const items = data.items.map((item) => ({
             ...item,
-            startDate:
-              // dateService.convertUTCDateToLocalDate(
-              new Date(item.startDate),
-            // )
-            endDate:
-              // dateService.convertUTCDateToLocalDate(
-              new Date(item.endDate),
-            // ),
+            startDate: item.startDate,
+            endDate: item.endDate,
           }));
 
           setAuctions(items);

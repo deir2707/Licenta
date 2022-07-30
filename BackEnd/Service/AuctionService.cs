@@ -49,7 +49,6 @@ namespace Service
                 Type = auctionInput.Type,
                 OtherDetails = otherDetails,
                 SellerId = _currentUserProvider.UserId,
-                Seller = _currentUserProvider.User
             };
 
             auction.Images = ExtractImages(auctionInput.Images, auction.Id);
@@ -57,11 +56,6 @@ namespace Service
             await _auctionRepository.InsertOneAsync(auction);
 
             return auction.Id;
-        }
-
-        private Dictionary<string, string> ParseOtherDetails(AuctionInput auctionInput)
-        {
-            return JsonConvert.DeserializeObject<Dictionary<string, string>>(auctionInput.OtherDetails);
         }
 
         public async Task<AuctionDetails> GetAuctionDetails(Guid id)
@@ -72,10 +66,12 @@ namespace Service
                 a => a.Bids.Select(b => b.Bidder),
             });
 
+            await IncludeBids(auction);
+
             return auction.ToAuctionDetails();
         }
 
-        public Task<PaginationOutput<AuctionOutput>> GetAllAuctionDetails(int page, int pageSize)
+        public async Task<PaginationOutput<AuctionOutput>> GetAllAuctionDetails(int page, int pageSize)
         {
             var query = _auctionRepository
                 .FilterBy(a => a.SellerId != _currentUserProvider.UserId && a.EndDate > DateTime.UtcNow,
@@ -90,46 +86,88 @@ namespace Service
 
             var auctions = query.AsQueryable().Page(page, pageSize).ToList();
 
+            foreach (var auction in auctions)
+            {
+                await IncludeBids(auction);
+            }
+
             var auctionDetails = auctions.Select(a => a.ToAuctionOutput()).ToList();
 
-            return Task.FromResult(new PaginationOutput<AuctionOutput>
+            return new PaginationOutput<AuctionOutput>
             {
                 Items = auctionDetails,
                 TotalItems = totalCount,
                 Page = page,
                 PageSize = pageSize
-            });
+            };
+        }
+
+        public async Task<List<AuctionOutput>> GetMyAuctions()
+        {
+            var auctions = _auctionRepository.FilterBy(a => a.SellerId == _currentUserProvider.UserId,
+                    new Expression<Func<Auction, object>>[]
+                    {
+                        a => a.Images,
+                        a => a.Bids
+                    }).OrderBy(a => a.EndDate)
+                .ToList();
+
+            foreach (var auction in auctions)
+            {
+                await IncludeBids(auction);
+            }
+
+            return auctions.Select(a => a.ToAuctionOutput()).ToList();
+        }
+
+        public async Task<List<AuctionOutput>> GetWonAuctions()
+        {
+            var auctions = _auctionRepository.FilterBy(a => a.BuyerId == _currentUserProvider.UserId,
+                    new Expression<Func<Auction, object>>[]
+                    {
+                        a => a.Images,
+                        a => a.Bids
+                    }).OrderBy(a => a.EndDate)
+                .ToList();
+
+            foreach (var auction in auctions)
+            {
+                await IncludeBids(auction);
+            }
+
+            return auctions.Select(a => a.ToAuctionOutput()).ToList();
         }
 
         public async Task<Guid> MakeBid(BidInput bidInput)
         {
-            var auction = await _auctionRepository.FindByIdAsync(bidInput.AuctionId, new Expression<Func<Auction, object>>[]
-            {
-                a => a.Bids
-            });
+            var auction = await _auctionRepository.FindByIdAsync(bidInput.AuctionId,
+                new Expression<Func<Auction, object>>[]
+                {
+                    a => a.Bids
+                });
 
-            var user = await _userRepository.FindByIdAsync(_currentUserProvider.UserId);
+            ValidateAuction(auction);
             
-            ValidateAuction(auction, user);
+            await IncludeBids(auction);
 
-            var highestBid = auction.Bids.Where(b => b.AuctionId == bidInput.AuctionId)
+            var highestBid = auction.Bids?.Where(b => b.AuctionId == bidInput.AuctionId)
                 .OrderByDescending(b => b.Amount).FirstOrDefault();
 
-            ValidateBid(bidInput, highestBid, auction, user);
+            ValidateBid(bidInput, highestBid, auction);
 
             var bid = new Bid
             {
                 AuctionId = bidInput.AuctionId,
                 Amount = bidInput.BidAmount,
-                BidderId = user.Id,
-                Bidder = user
+                BidderId = _currentUserProvider.UserId,
             };
 
-            auction.Bids.Add(bid);
+            await RefundPreviousHighestBidder(highestBid);
+
             await _bidsRepository.InsertOneAsync(bid);
-            
-            user.Balance -= bidInput.BidAmount;
-            await _userRepository.ReplaceOneAsync(user);
+
+            _currentUserProvider.User.Balance -= bidInput.BidAmount;
+            await _userRepository.ReplaceOneAsync(_currentUserProvider.User);
 
             await _notificationPublisher.PublishMessageToUser(new Notification
             {
@@ -144,55 +182,47 @@ namespace Service
             return bid.Id;
         }
 
-        public Task<List<AuctionOutput>> GetMyAuctions()
+        private async Task IncludeBids(Auction auction)
         {
-            return Task.FromResult(_auctionRepository
-                .FilterBy(a => a.SellerId == _currentUserProvider.UserId,
-                    a => a.ToAuctionOutput(),
-                    new Expression<Func<Auction, object>>[]
-                    {
-                        a => a.Images,
-                        a => a.Bids
-                    })
-                .OrderBy(a => a.EndDate)
-                .ToList());
+            if (auction.Bids != null)
+                return;
+            
+            var bids = _bidsRepository.FilterBy(b => b.AuctionId == auction.Id).ToList();
+
+            foreach (var bid in bids)
+            {
+                bid.Bidder = await _userRepository.FindOneAsync(b => b.Id == bid.BidderId);
+            }
+
+            auction.Bids = bids;
         }
 
-        public Task<List<AuctionOutput>> GetWonAuctions()
+        private Dictionary<string, string> ParseOtherDetails(AuctionInput auctionInput)
         {
-            return Task.FromResult(_auctionRepository
-                .FilterBy(a => a.BuyerId == _currentUserProvider.UserId,
-                    a => a.ToAuctionOutput(),
-                    new Expression<Func<Auction, object>>[]
-                    {
-                        a => a.Images,
-                        a => a.Bids
-                    })
-                .OrderBy(a => a.EndDate)
-                .ToList());
+            return JsonConvert.DeserializeObject<Dictionary<string, string>>(auctionInput.OtherDetails);
         }
 
-        private void ValidateAuction(Auction auction, User user)
+        private void ValidateAuction(Auction auction)
         {
             if (auction == null)
             {
                 throw new AuctionException(ErrorCode.AuctionNotFound, "Auction not found");
             }
-            
+
             if (auction.EndDate < DateTime.UtcNow)
             {
                 throw new AuctionException(ErrorCode.AuctionEnded, "Auction has ended");
             }
 
-            if (auction.SellerId == user.Id)
+            if (auction.SellerId == _currentUserProvider.UserId)
             {
                 throw new AuctionException(ErrorCode.BidOnOwnAuction, "You cannot bid on your own auction");
             }
         }
 
-        private void ValidateBid(BidInput bidInput, Bid highestBid, Auction auction, User user)
+        private void ValidateBid(BidInput bidInput, Bid? highestBid, Auction auction)
         {
-            if (user.Balance < bidInput.BidAmount)
+            if (_currentUserProvider.User.Balance < bidInput.BidAmount)
             {
                 throw new AuctionException(ErrorCode.InsufficientBalance, "Insufficient balance");
             }
@@ -212,7 +242,27 @@ namespace Service
                     throw new AuctionException(ErrorCode.BidTooSmall,
                         "Bid amount must be greater than the highest bid");
                 }
+
+                if (highestBid.BidderId == _currentUserProvider.UserId)
+                {
+                    throw new AuctionException(ErrorCode.BidOnAlreadyWinningAuction,
+                        "You cannot bid on an auction you are already winning");
+                }
             }
+        }
+
+        private async Task RefundPreviousHighestBidder(Bid? highestBid)
+        {
+            if (highestBid == null)
+            {
+                return;
+            }
+
+            var previousBidder = await _userRepository.FindByIdAsync(highestBid.BidderId);
+
+            previousBidder.Balance += highestBid.Amount;
+
+            await _userRepository.ReplaceOneAsync(previousBidder);
         }
 
         private static List<Image> ExtractImages(List<IFormFile> images, Guid auctionId)
@@ -236,21 +286,6 @@ namespace Service
 
                 return photoEntity;
             }).ToList();
-        }
-
-        private async Task<Auction> GetAuction(Guid id)
-        {
-            var auction = await _auctionRepository.FindByIdAsync(id, new Expression<Func<Auction, object>>[]
-            {
-                a => a.Bids
-            });
-
-            if (auction == null)
-            {
-                throw new AuctionException(ErrorCode.AuctionNotFound, "Auction not found");
-            }
-
-            return auction;
         }
     }
 }

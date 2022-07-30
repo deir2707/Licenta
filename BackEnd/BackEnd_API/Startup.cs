@@ -13,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
+using MongoDB.Bson.Serialization;
 using Repository;
 using Service;
 
@@ -33,6 +34,12 @@ namespace BackEnd
             var shouldUseMongoDb = Configuration.GetValue<bool>("UseMongoDb");
             if (shouldUseMongoDb)
             {
+                BsonClassMap.RegisterClassMap<Auction>();
+                
+                BsonClassMap.RegisterClassMap<User>();
+                
+                BsonClassMap.RegisterClassMap<Bid>();
+
                 services.Configure<MongoDbSettings>(Configuration.GetSection("MongoDbSettings"));
 
                 services.AddSingleton<IMongoDbSettings>(serviceProvider =>
@@ -65,8 +72,6 @@ namespace BackEnd
             
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IAuctionService, AuctionService>();
-            // services.AddTransient<IEntityFrameworkRepository<User>, EntityFrameworkRepository2<User>>();
-            // services.AddTransient<IEntityFrameworkRepository<Auction>, EntityFrameworkRepository2<Auction>>();
 
             services.AddSingleton<INotificationPublisher, AuctionHub>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

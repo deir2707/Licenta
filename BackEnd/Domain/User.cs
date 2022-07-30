@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Infrastructure.Mongo;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace Domain
 {
@@ -19,10 +20,10 @@ namespace Domain
     
         public Guid? AddressId { get; set; }
     
-        public Address? Address { get; set; }
-    
-        public List<Auction> Auctions { get; set; } = new();
-        public List<Bid> Bids { get; set; } = new();
+        
+        [BsonIgnore] public Address? Address { get; set; }
+        [BsonIgnore] public List<Auction> Auctions { get; set; }
+        [BsonIgnore] public List<Bid> Bids { get; set; }
 
     }
 }

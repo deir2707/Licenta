@@ -31,6 +31,22 @@ export class DateService implements IDate {
     const formatedDate = moment(dateObject).locale("en").format(format);
     return formatedDate;
   };
+  
+  formatDateAndTime = (
+    date: string | Date | undefined,
+    format: string = "LLL"
+  ): string => {
+    if (!date) return "";
+
+    let dateObject = date;
+
+    if (typeof date === "string") {
+      dateObject = new Date(date);
+    }
+
+    const formatedDate = moment(dateObject).locale("en").format(format);
+    return formatedDate;
+  };
 
   convertUTCDateToLocalDate = (date: Date): Date => {
     var newDate = new Date(

@@ -9,6 +9,7 @@
         AuctionEnded = 201,
         BidTooSmall = 300,
         BidOnOwnAuction = 301,
+        BidOnAlreadyWinningAuction = 302,
     }
     
 }

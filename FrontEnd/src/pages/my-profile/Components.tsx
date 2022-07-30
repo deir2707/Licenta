@@ -7,7 +7,6 @@ import { AuctionsList } from "../../components/auctions-list/AuctionsList";
 import { useApiError } from "../../hooks/useApiError";
 import { AuctionOutput } from "../../interfaces/AuctionInterfaces";
 import { AddBalanceInput, UserDetails } from "../../interfaces/UsersInterfaces";
-import dateService from "../../services/DateService";
 
 export const MyProfileDetails = () => {
   const id = localStorage.getItem("userId");
@@ -86,13 +85,7 @@ export const MyAuctions = () => {
   const loadAuctions = useCallback(async () => {
     Api.get<AuctionOutput[]>(ApiEndpoints.get_my_auctions)
       .then(({ data }) => {
-        const items = data.map((item) => ({
-          ...item,
-          endDate: dateService.convertUTCDateToLocalDate(
-            new Date(item.endDate)
-          ),
-        }));
-        setAuctions(items);
+        setAuctions(data);
       })
       .catch((error) => {
         handleApiError(error);
@@ -114,13 +107,7 @@ export const WonAuctions = () => {
   const loadAuctions = useCallback(async () => {
     Api.get<AuctionOutput[]>(ApiEndpoints.get_won_auctions)
       .then(({ data }) => {
-        const items = data.map((item) => ({
-          ...item,
-          endDate: dateService.convertUTCDateToLocalDate(
-            new Date(item.endDate)
-          ),
-        }));
-        setAuctions(items);
+        setAuctions(data);
       })
       .catch((error) => {
         handleApiError(error);

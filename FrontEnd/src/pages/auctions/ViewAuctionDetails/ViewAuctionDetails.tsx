@@ -14,6 +14,7 @@ import { AuctionDetails } from "../../../interfaces/AuctionInterfaces";
 import { BidInput } from "../../../interfaces/BidsInterfaces";
 import { useApiError } from "../../../hooks/useApiError";
 import "./ViewAuctionDetails.scss";
+import dateService from "../../../services/DateService";
 
 export const ViewAuctionDetails = () => {
   const { id } = useParams();
@@ -148,6 +149,10 @@ export const ViewAuctionDetails = () => {
           </div>
         </div>
         <div className="bids-container">
+          <div className="end-date">
+            <strong>End Date: </strong>
+            <span>{dateService.formatDateAndTime(auction?.endDate)}</span>
+          </div>
           <div className="title">Bids</div>
           <Divider flexItem />
           <div className="bids">{bids}</div>
