@@ -1,5 +1,4 @@
 import { Container, Grid } from "@mui/material";
-import React from "react";
 import { Navbar } from "./Navbar/Navbar";
 
 interface PageLayoutProps {
@@ -14,7 +13,9 @@ export const PageLayout = (props: PageLayoutProps) => {
         <Navbar />
       </Grid>
       <Grid item xs={12}>
-        <Container >{props.children}</Container>
+        <Container>
+          {props.isLoading ? <div>Loading...</div> : props.children}
+        </Container>
       </Grid>
     </Grid>
   );

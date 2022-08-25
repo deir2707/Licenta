@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Button, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
@@ -22,6 +22,19 @@ export const MyProfilePage = () => {
     },
     [selectedSubMenu]
   );
+
+  const pageContent = useMemo(() => {
+    switch (selectedSubMenu) {
+      case "details":
+        return <MyProfileDetails />;
+
+      case "my-auctions":
+        return <MyAuctions />;
+
+      case "won-auctions":
+        return <WonAuctions />;
+    }
+  }, [selectedSubMenu]);
 
   if (!id) {
     return (
@@ -66,9 +79,7 @@ export const MyProfilePage = () => {
             Won Auctions
           </div>
         </Stack>
-        {selectedSubMenu === "details" && <MyProfileDetails />}
-        {selectedSubMenu === "my-auctions" && <MyAuctions />}
-        {selectedSubMenu === "won-auctions" && <WonAuctions />}
+        {pageContent}
       </div>
     </PageLayout>
   );

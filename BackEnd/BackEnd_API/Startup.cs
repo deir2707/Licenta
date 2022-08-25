@@ -72,6 +72,7 @@ namespace BackEnd
             
             services.AddTransient<IUserService, UserService>();
             services.AddTransient<IAuctionService, AuctionService>();
+            services.AddTransient<IStatisticsService, StatisticsService>();
 
             services.AddSingleton<INotificationPublisher, AuctionHub>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

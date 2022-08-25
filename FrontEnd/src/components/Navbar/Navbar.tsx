@@ -20,6 +20,10 @@ const menuItems = [
     name: "My Profile",
     path: "/my-profile",
   },
+  {
+    name: "Statistics",
+    path: "/statistics",
+  },
 ];
 
 const getPath = (pathname: string) => {
@@ -59,9 +63,9 @@ export const Navbar = () => {
           </Link>
         );
       })}
-      <Button className="logoutButton" onClick={handleLogout}>
+      <div className="navbarItem logoutButton" onClick={handleLogout}>
         Logout
-      </Button>
+      </div>
     </Stack>
   );
 };

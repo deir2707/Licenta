@@ -1,4 +1,4 @@
-import { TextField, Button } from "@mui/material";
+import { TextField, Button, Grid } from "@mui/material";
 import React, { useCallback, useEffect, useState } from "react";
 
 import Api from "../../Api";
@@ -40,6 +40,7 @@ export const MyProfileDetails = () => {
       addBalanceInput
     )
       .then(({ data }) => {
+        setBalanceToAdd(0);
         loadDetails();
       })
       .catch((error) => {
@@ -47,40 +48,82 @@ export const MyProfileDetails = () => {
       });
   }, [balanceToAdd, handleApiError, loadDetails]);
 
+  if (!userDetails) {
+    return <div>Loading...</div>;
+  }
+
   return (
-    <>
-      User Details:
-      {!userDetails && <div> loading</div>}
-      {userDetails && (
-        <div>
-          <div>Email: {userDetails?.email}</div>
-          <div>Full Name: {userDetails?.fullName}</div>
-          <div>Balance: {userDetails?.balance}</div>
-          <div>
-            <TextField
-              id="add-balance"
-              label="balance"
-              type="number"
-              value={balanceToAdd}
-              onChange={(e) => setBalanceToAdd(Number(e.target.value))}
-            />
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleAddBalance}
-            >
-              Add balance
-            </Button>
-          </div>
-        </div>
-      )}
-    </>
+    <div className="user-details">
+      <p>User Details:</p>
+      <Grid container spacing={2}>
+        <Grid item xs={6}>
+          <TextField
+            className="detail"
+            id="email"
+            name="email"
+            label="Email address"
+            type="string"
+            value={userDetails?.email}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            className="detail"
+            id="fullName"
+            name="fullName"
+            label="Full Name"
+            type="string"
+            value={userDetails?.fullName}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={6}>
+          <TextField
+            className="detail"
+            id="currentBalance"
+            name="currentBalance"
+            label="Current Balance"
+            type="string"
+            value={userDetails?.balance}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+        </Grid>
+        <Grid item xs={6} className="detail">
+          <TextField
+            id="addBalance"
+            label="Add Balance"
+            type="number"
+            value={balanceToAdd}
+            onChange={(e) => {
+              const value = Number(e.target.value);
+              if (value >= 0) {
+                setBalanceToAdd(value);
+              }
+            }}
+          />
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleAddBalance}
+          >
+            Add balance
+          </Button>
+        </Grid>
+      </Grid>
+    </div>
   );
 };
 
 export const MyAuctions = () => {
   const { handleApiError } = useApiError();
-  const [auctions, setAuctions] = React.useState<AuctionOutput[]>([]);
+  const [auctions, setAuctions] = React.useState<AuctionOutput[]>();
 
   const loadAuctions = useCallback(async () => {
     Api.get<AuctionOutput[]>(ApiEndpoints.get_my_auctions)
@@ -96,6 +139,10 @@ export const MyAuctions = () => {
     loadAuctions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!auctions) {
+    return <div>Loading...</div>;
+  }
 
   return <AuctionsList auctions={auctions} />;
 };
@@ -118,6 +165,10 @@ export const WonAuctions = () => {
     loadAuctions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  if (!auctions) {
+    return <div>Loading...</div>;
+  }
 
   return <AuctionsList auctions={auctions} />;
 };

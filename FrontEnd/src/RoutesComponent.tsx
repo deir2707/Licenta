@@ -7,6 +7,7 @@ import { LoginPage } from "./pages/LoginPage";
 import { MainPage } from "./pages/MainPage";
 import { RegisterPage } from "./pages/RegisterPage";
 import { MyProfilePage } from "./pages/my-profile/MyProfilePage";
+import { StatisticsPage } from "./pages/statistics/StatisticsPage";
 
 export const RoutesComponent = () => {
   return (
@@ -18,6 +19,7 @@ export const RoutesComponent = () => {
       <Route path="/auctions" element={<AuctionsPage />} />
       <Route path="/auctions/:id" element={<ViewAuctionDetails />} />
       <Route path="/add-auction" element={<AddAuctionPage />} />
+      <Route path="/statistics" element={<StatisticsPage />} />
     </Routes>
   );
 };

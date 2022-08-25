@@ -10,6 +10,10 @@ export interface AuctionsListProps {
 export const AuctionsList = (props: AuctionsListProps) => {
   const { auctions } = props;
 
+  if (auctions.length === 0) {
+    return <div>There are no auctions!</div>;
+  }
+
   return (
     <div className="auctions-list">
       {auctions.map((auction) => {

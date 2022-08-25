@@ -100,16 +100,19 @@ export const AuctionsPage = () => {
       PubSub.unsubscribe(PubSubEvents.AuctionFinished);
     };
   }, [handleAuctionFinished, loadAuctions]);
+  
   return (
     <PageLayout>
       <div id="view-auctions">
-        <Pagination
-          className="auctions-pagination"
-          count={Math.ceil(totalItems / pageSize)}
-          shape="rounded"
-          variant="outlined"
-          onChange={handlePaginationChange}
-        />
+        {auctions.length !== 0 && (
+          <Pagination
+            className="auctions-pagination"
+            count={Math.ceil(totalItems / pageSize)}
+            shape="rounded"
+            variant="outlined"
+            onChange={handlePaginationChange}
+          />
+        )}
         <AuctionsList auctions={auctions} />
       </div>
     </PageLayout>

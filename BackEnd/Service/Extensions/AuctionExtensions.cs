@@ -28,6 +28,9 @@ namespace Service.Extensions
         }
         public static AuctionDetails ToAuctionDetails(this Auction auction)
         {
+            if (auction == null)
+                return null;
+
             var highestBid = auction.Bids.OrderByDescending(b => b.Amount).FirstOrDefault();
             
             return new AuctionDetails

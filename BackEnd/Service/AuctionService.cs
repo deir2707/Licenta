@@ -157,7 +157,7 @@ namespace Service
 
             var bid = new Bid
             {
-                AuctionId = bidInput.AuctionId,
+                AuctionId = auction.Id,
                 Amount = bidInput.BidAmount,
                 BidderId = _currentUserProvider.UserId,
             };
