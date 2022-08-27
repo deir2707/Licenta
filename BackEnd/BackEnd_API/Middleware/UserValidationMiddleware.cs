@@ -23,9 +23,11 @@ namespace BackEnd.Middleware
                 context.Response.StatusCode = 401;
                 return;
             }
+
             if (context.Request.Method == "OPTIONS" ||
                 pathValue.Contains("register") ||
                 pathValue.Contains("login") ||
+                pathValue.Contains("get-all") ||
                 pathValue.Contains("hub"))
             {
                 await _next(context);

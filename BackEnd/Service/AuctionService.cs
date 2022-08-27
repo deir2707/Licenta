@@ -45,7 +45,7 @@ namespace Service
                 StartingPrice = auctionInput.StartPrice,
                 Description = auctionInput.Description,
                 StartDate = DateTime.UtcNow,
-                EndDate = DateTime.UtcNow.AddDays(7),
+                EndDate = auctionInput.EndDate ?? DateTime.UtcNow.AddDays(7),
                 Type = auctionInput.Type,
                 OtherDetails = otherDetails,
                 SellerId = _currentUserProvider.UserId,
@@ -83,6 +83,14 @@ namespace Service
                 .OrderBy(a => a.EndDate);
 
             var totalCount = query.Count();
+
+            if (totalCount == 0)
+            {
+                return new PaginationOutput<AuctionOutput>
+                {
+                    TotalItems = totalCount,
+                };
+            }
 
             var auctions = query.AsQueryable().Page(page, pageSize).ToList();
 
@@ -147,7 +155,7 @@ namespace Service
                 });
 
             ValidateAuction(auction);
-            
+
             await IncludeBids(auction);
 
             var highestBid = auction.Bids?.Where(b => b.AuctionId == bidInput.AuctionId)
@@ -186,7 +194,7 @@ namespace Service
         {
             if (auction.Bids != null)
                 return;
-            
+
             var bids = _bidsRepository.FilterBy(b => b.AuctionId == auction.Id).ToList();
 
             foreach (var bid in bids)

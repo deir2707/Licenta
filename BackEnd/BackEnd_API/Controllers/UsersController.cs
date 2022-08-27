@@ -8,7 +8,7 @@ namespace BackEnd.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class UsersController: ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _userService;
 
@@ -31,13 +31,20 @@ namespace BackEnd.Controllers
             return Ok(addedId);
         }
 
+        [HttpGet("get-all")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userService.GetAllUsers();
+            return Ok(users);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetUser(Guid id)
         {
             var userDto = await _userService.GetUserDetails(id);
             return Ok(userDto);
         }
-        
+
         [HttpPost("add-balance")]
         public async Task<IActionResult> AddBalance(AddBalanceInput addBalanceInput)
         {

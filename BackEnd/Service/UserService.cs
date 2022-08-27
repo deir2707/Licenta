@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Domain;
@@ -35,7 +36,7 @@ namespace Service
                 Password = registerInput.Password,
                 FullName = registerInput.FullName,
             };
-            
+
             _currentUserProvider.SetUser(newUser);
 
             await _userRepository.InsertOneAsync(newUser);
@@ -46,10 +47,10 @@ namespace Service
         public async Task<UserDetails> GetUserDetails(Guid id)
         {
             var user = await _userRepository.FindByIdAsync(id);
-            
+
             if (user is null)
                 throw new AuctionException(ErrorCode.UserNotFound, "User not found");
-            
+
             return user.ToUserDetails();
         }
 
@@ -64,7 +65,7 @@ namespace Service
 
             if (user is null)
                 throw new AuctionException(ErrorCode.UserNotFound, "Invalid credentials");
-            
+
             if (!user.Password.Equals(loginInput.Password))
                 throw new AuctionException(ErrorCode.UserNotFound, "Invalid credentials");
 
@@ -74,15 +75,22 @@ namespace Service
         public async Task<Guid> AddBalance(AddBalanceInput addBalanceInput)
         {
             var user = await _userRepository.FindByIdAsync(_currentUserProvider.UserId);
-            
+
             if (user is null)
             {
                 throw new AuctionException(ErrorCode.UserNotFound, "User not found");
             }
-            
+
             user.Balance += addBalanceInput.BalanceToAdd;
             await _userRepository.ReplaceOneAsync(user);
             return user.Id;
+        }
+
+        public Task<List<UserDetails>> GetAllUsers()
+        {
+            var users = _userRepository.AsQueryable().ToList();
+
+            return Task.FromResult(users.Select(u => u.ToUserDetails()).ToList());
         }
     }
 }

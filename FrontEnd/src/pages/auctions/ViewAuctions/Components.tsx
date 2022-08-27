@@ -43,7 +43,13 @@ export const AuctionItem = (props: AuctionItemProps) => {
   }, [id, navigate]);
 
   const isFinishedClass = useMemo(() => {
-    return isFinished || timeLeft.seconds <= 0 ? " finished" : "";
+    return isFinished ||
+      (timeLeft.days <= 0 &&
+        timeLeft.hours <= 0 &&
+        timeLeft.minutes <= 0 &&
+        timeLeft.seconds <= 0)
+      ? " finished"
+      : "";
   }, [isFinished, timeLeft]);
 
   return (
@@ -70,7 +76,13 @@ export const AuctionItem = (props: AuctionItemProps) => {
       </div>
       <Divider orientation="vertical" flexItem />
       <div className="expiration">
-        {!(isFinished || timeLeft.seconds <= 0) ? (
+        {!(
+          isFinished ||
+          (timeLeft.days <= 0 &&
+            timeLeft.hours <= 0 &&
+            timeLeft.minutes <= 0 &&
+            timeLeft.seconds <= 0)
+        ) ? (
           <>
             <strong>Ends in:</strong>
             {dateService.durationToString(timeLeft)}

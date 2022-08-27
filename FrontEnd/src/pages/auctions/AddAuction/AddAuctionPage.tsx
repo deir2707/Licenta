@@ -134,7 +134,7 @@ export const AddAuctionPage = () => {
       }
     }
 
-    Api.post<any, number>(`${ApiEndpoints.add_car}`, formdata, {
+    Api.post<any, number>(`${ApiEndpoints.add_auction}`, formdata, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
