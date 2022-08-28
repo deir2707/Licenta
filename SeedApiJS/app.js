@@ -1,16 +1,22 @@
 import pkg from "lodash";
 const { sample, random, range } = pkg;
 import { getAllAuctions, addAuction, makeBid } from "./auctions.js";
-import { getAllUsers, createUser, addBalance } from "./users.js";
+import {
+  getAllUsers,
+  createUser,
+  addBalance,
+  addDefaultUsers,
+} from "./users.js";
 
 process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = "0";
 
 async function main() {
-  await addUsers();
-  const users = await getAllUsers();
-  await addAuctions(users);
+  // await addDefaultUsers();
+  // await addUsers();
+  // const users = await getAllUsers();
+  // await addAuctions(users);
   const auctions = await getAllAuctions();
-  await addBids(users, auctions);
+  // await addBids(users, auctions);
 }
 
 async function addUsers() {

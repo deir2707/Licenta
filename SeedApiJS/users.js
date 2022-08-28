@@ -15,6 +15,38 @@ export async function getAllUsers() {
   );
 }
 
+export async function addDefaultUsers() {
+  const user1 = {
+    Id: "00000000-0000-0000-0000-000000000001",
+    Email: "user1@email.com",
+    Password: "password",
+    FullName: "User1",
+  };
+  const user2 = {
+    Id: "00000000-0000-0000-0000-000000000002",
+    Email: "user2@email.com",
+    Password: "password2",
+    FullName: "User2",
+  };
+
+  const response = await axios.post(
+    `${globals.users_endpoint}/register`,
+    user1,
+    {
+      headers: globals.headers,
+    }
+  );
+  console.log(response.data);
+  const response2 = await axios.post(
+    `${globals.users_endpoint}/register`,
+    user2,
+    {
+      headers: globals.headers,
+    }
+  );
+  console.log(response2.data);
+}
+
 export async function createUser() {
   const fullName = uniqueNamesGenerator({
     dictionaries: [names, names],
