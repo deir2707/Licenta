@@ -37,6 +37,13 @@ namespace Service
                 FullName = registerInput.FullName,
             };
 
+            if (registerInput.Id.HasValue)
+            {
+                if (_userRepository.FindOne(u => u.Id == registerInput.Id.Value) is not null)
+                    throw new AuctionException(ErrorCode.UserAlreadyExists, "User already exists");
+                newUser.Id = registerInput.Id.Value;
+            }
+
             _currentUserProvider.SetUser(newUser);
 
             await _userRepository.InsertOneAsync(newUser);
