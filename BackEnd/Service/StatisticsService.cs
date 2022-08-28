@@ -112,7 +112,7 @@ namespace Service
 
                 if (auctionBids.Count == 0) continue;
 
-                var highestBid = auctionBids.Max().Amount;
+                var highestBid = auctionBids.Max(b=>b.Amount);
                 if (highestBid > mostExpensivePrice)
                 {
                     mostExpensive = auction;
