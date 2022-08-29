@@ -55,10 +55,11 @@ namespace BackEnd
                 services.AddDbContext<AuctionContext>(options =>
                     options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-                services.AddTransient<IRepository<User>, EntityFrameworkRepository<User>>();
-                services.AddTransient<IRepository<Auction>, EntityFrameworkRepository<Auction>>();
-                services.AddTransient<IRepository<Bid>, EntityFrameworkRepository<Bid>>();
-                services.AddTransient<IRepository<Image>, EntityFrameworkRepository<Image>>();
+                services.AddRepoDependencies();
+                // services.AddTransient<IRepository<User>, EntityFrameworkRepository<User>>();
+                // services.AddTransient<IRepository<Auction>, EntityFrameworkRepository<Auction>>();
+                // services.AddTransient<IRepository<Bid>, EntityFrameworkRepository<Bid>>();
+                // services.AddTransient<IRepository<Image>, EntityFrameworkRepository<Image>>();
             }
             
             services.AddControllers();
@@ -69,10 +70,12 @@ namespace BackEnd
                 c.SwaggerDoc("v1", new OpenApiInfo {Title = "BackEnd_API", Version = "v1"}); 
                 c.OperationFilter<CustomHeaderSwaggerAttribute>();
             });
+
+            services.AddAppDependencies();
             
-            services.AddTransient<IUserService, UserService>();
-            services.AddTransient<IAuctionService, AuctionService>();
-            services.AddTransient<IStatisticsService, StatisticsService>();
+            // services.AddTransient<IUserService, UserService>();
+            // services.AddTransient<IAuctionService, AuctionService>();
+            // services.AddTransient<IStatisticsService, StatisticsService>();
 
             services.AddSingleton<INotificationPublisher, AuctionHub>();
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();

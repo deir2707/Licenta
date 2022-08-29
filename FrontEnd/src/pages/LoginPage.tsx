@@ -36,7 +36,7 @@ export const LoginPage = () => {
         setFullName(fullname);
         setEmail(email);
         setBalance(balance);
-        navigate("/mainpage");
+        navigate("/auctions");
       })
       .catch((error) => {
         handleApiError(error, formikHelpers.setStatus);

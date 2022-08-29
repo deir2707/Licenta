@@ -109,6 +109,7 @@ export const MyProfileDetails = () => {
             }}
           />
           <Button
+            id="addBalanceButton"
             variant="contained"
             color="primary"
             onClick={handleAddBalance}

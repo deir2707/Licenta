@@ -55,7 +55,7 @@ namespace BackEnd.Controllers
         [HttpPost("make-bid")]
         public async Task<IActionResult> MakeBid(BidInput bidInput)
         {
-            var id = await _auctionService.MakeBid(bidInput);
+            var id = await _auctionService.MakeBid(bidInput.AuctionId, bidInput.BidAmount);
             return Ok(id);
         }
     }

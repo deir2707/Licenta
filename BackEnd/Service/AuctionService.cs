@@ -146,9 +146,9 @@ namespace Service
             return auctions.Select(a => a.ToAuctionOutput()).ToList();
         }
 
-        public async Task<Guid> MakeBid(BidInput bidInput)
+        public async Task<Guid> MakeBid(Guid auctionId, int bidAmount)
         {
-            var auction = await _auctionRepository.FindByIdAsync(bidInput.AuctionId,
+            var auction = await _auctionRepository.FindByIdAsync(auctionId,
                 new Expression<Func<Auction, object>>[]
                 {
                     a => a.Bids
@@ -158,15 +158,15 @@ namespace Service
 
             await IncludeBids(auction);
 
-            var highestBid = auction.Bids?.Where(b => b.AuctionId == bidInput.AuctionId)
+            var highestBid = auction.Bids?.Where(b => b.AuctionId == auctionId)
                 .OrderByDescending(b => b.Amount).FirstOrDefault();
 
-            ValidateBid(bidInput, highestBid, auction);
+            ValidateBid(bidAmount, highestBid, auction);
 
             var bid = new Bid
             {
                 AuctionId = auction.Id,
-                Amount = bidInput.BidAmount,
+                Amount = bidAmount,
                 BidderId = _currentUserProvider.UserId,
             };
 
@@ -174,7 +174,7 @@ namespace Service
 
             await _bidsRepository.InsertOneAsync(bid);
 
-            _currentUserProvider.User.Balance -= bidInput.BidAmount;
+            _currentUserProvider.User.Balance -= bidAmount;
             await _userRepository.ReplaceOneAsync(_currentUserProvider.User);
 
             await _notificationPublisher.PublishMessageToUser(new Notification
@@ -182,8 +182,8 @@ namespace Service
                 Event = NotificationEvents.AuctionBid,
                 Data = new BidNotification
                 {
-                    AuctionId = bidInput.AuctionId,
-                    BidAmount = bidInput.BidAmount,
+                    AuctionId = auctionId,
+                    BidAmount = bidAmount,
                 }
             });
 
@@ -207,6 +207,9 @@ namespace Service
 
         private Dictionary<string, string> ParseOtherDetails(AuctionInput auctionInput)
         {
+            if (auctionInput.OtherDetails == null)
+                throw new AuctionException(ErrorCode.AuctionHasNoDetails, "Auction has no details");
+
             return JsonConvert.DeserializeObject<Dictionary<string, string>>(auctionInput.OtherDetails);
         }
 
@@ -228,16 +231,16 @@ namespace Service
             }
         }
 
-        private void ValidateBid(BidInput bidInput, Bid? highestBid, Auction auction)
+        private void ValidateBid(int bidAmount, Bid? highestBid, Auction auction)
         {
-            if (_currentUserProvider.User.Balance < bidInput.BidAmount)
+            if (_currentUserProvider.User.Balance < bidAmount)
             {
                 throw new AuctionException(ErrorCode.InsufficientBalance, "Insufficient balance");
             }
 
             if (highestBid == null)
             {
-                if (bidInput.BidAmount <= auction.StartingPrice)
+                if (bidAmount <= auction.StartingPrice)
                 {
                     throw new AuctionException(ErrorCode.BidTooSmall,
                         "Bid amount must be greater than the starting bid");
@@ -245,7 +248,7 @@ namespace Service
             }
             else
             {
-                if (bidInput.BidAmount <= highestBid.Amount)
+                if (bidAmount <= highestBid.Amount)
                 {
                     throw new AuctionException(ErrorCode.BidTooSmall,
                         "Bid amount must be greater than the highest bid");

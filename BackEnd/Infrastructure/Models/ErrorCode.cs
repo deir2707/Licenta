@@ -10,6 +10,7 @@
         BidTooSmall = 300,
         BidOnOwnAuction = 301,
         BidOnAlreadyWinningAuction = 302,
+        AuctionHasNoDetails = 400,
     }
     
 }
