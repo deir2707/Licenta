@@ -59,7 +59,7 @@ export const AuctionItem = (props: AuctionItemProps) => {
       </div>
       <Divider orientation="vertical" flexItem />
       <div className="details">
-        <div className="title">{title.split(" ")[0]}</div>
+        <div className="title">{title}</div>
         <div>{description}</div>
         <div>
           <strong>Bids:</strong> {noOfBids} |{" "}

@@ -28,23 +28,31 @@ export async function addDefaultUsers() {
     Password: "password2",
     FullName: "User2",
   };
+  try {
+    const response = await axios.post(
+      `${globals.users_endpoint}/register`,
+      user1,
+      {
+        headers: globals.headers,
+      }
+    );
 
-  const response = await axios.post(
-    `${globals.users_endpoint}/register`,
-    user1,
-    {
-      headers: globals.headers,
-    }
-  );
-  console.log(response.data);
-  const response2 = await axios.post(
-    `${globals.users_endpoint}/register`,
-    user2,
-    {
-      headers: globals.headers,
-    }
-  );
-  console.log(response2.data);
+    console.log(response.data);
+  } catch (e) {
+    console.log(e)
+  }
+  try {
+    const response2 = await axios.post(
+      `${globals.users_endpoint}/register`,
+      user2,
+      {
+        headers: globals.headers,
+      }
+    );
+    console.log(response2.data);
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 export async function createUser() {
