@@ -1,0 +1,31 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+autonumber
+
+actor User as User
+boundary "Web App" as WebApp
+control "Server" as Server
+database "Database" as Db
+
+User -> WebApp : Bid on auction
+WebApp --> Server : MakeBid(auctionId, bidAmount)
+Server --> Db : GetAuction(auctionId)
+alt auction exists
+    Db --> Server : returns Auction
+    Server --> Db : GetBids(auctionId)
+    Db --> Server : returns Bids
+    Server --> Db : UpdatePreviousHighestBidder(bidderId, amount)
+    Server --> Db : UpdateBidderBalance(bidderId, amount)
+    Server --> Db : AddBid(auctionId, bidderId, amount)
+    Db --> Server : returns bidId
+    Server --> WebApp : BidSuccess(bidId)
+    WebApp -> User: Refresh page
+else auction does not exist
+    Db --> Server : AuctionNotFound(auctionId)
+    Server --> WebApp : AuctionNotFound(auctionId)
+    WebApp -> User: Refresh page
+end
+
+
+@enduml

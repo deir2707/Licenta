@@ -5,10 +5,6 @@ import "./Navbar.scss";
 
 const menuItems = [
   {
-    name: "Main page",
-    path: "/mainpage",
-  },
-  {
     name: "Auctions",
     path: "/auctions",
   },

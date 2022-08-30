@@ -39,7 +39,7 @@ export const RegisterPage = () => {
         setFullName(data.fullName);
         setEmail(data.email);
         setBalance(data.balance);
-        navigate("/mainpage");
+        navigate("/auctions");
       })
       .catch((error) => {
         handleApiError(error, formikHelpers.setStatus);
